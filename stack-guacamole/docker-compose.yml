@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  guacd:
+    image: guacamole/guacd
+    container_name: guacd
+    environment:
+      - "GUACD_LOG_LEVEL=debug"
+      - "GUACD_PORT=${GUACD_PORT:-4822}"
+    networks:
+      - guacd
+    volumes:
+    - guacd-record:/record:rw
+    
+  guacamole:
+    image: guacamole/guacamole
+    container_name: guacamole
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guacamole.rule=Host(`guacamole.${HOST}`)"
+      - "traefik.http.routers.guacamole.entryPoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.guacamole.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.guacamole.priority=15"
+      - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
+      - "traefik.docker.network=monitoring"
+    environment:
+      - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
+      - MYSQL_HOSTNAME=mysql
+      - GUACD_PORT=${GUACD_PORT:-4822}
+      - EXTENSION_PRIORITY=mysql
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_AUTO_CREATE_ACCOUNTS=true
+    restart: unless-stopped
+    networks:
+      - guacd
+      - guacamole
+
+  mysql:
+    image: mysql/guacamole:latest
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - guacd
+
+networks:
+  guacamole:
+    external: true
+  guacd:
+    driver: bridge
+    name: guacd
+
+volumes:
+  guacd-record: {}
+  mysql-data: {}

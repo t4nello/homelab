@@ -1,0 +1,30 @@
+services:
+  qbittorrent:
+    image: qbittorrentofficial/qbittorrent-nox:latest
+    container_name: qbittorrent
+    volumes:
+      - ${CONFIG_PATH}:/config
+      - ${DOWNLOAD_PATH}:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
+      - "traefik.http.routers.qbittorrent.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+
+      - "traefik.tcp.routers.qbittorrent-tcp.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.qbittorrent-tcp.entrypoints=qbittorrent-tcp"
+      - "traefik.tcp.services.qbittorrent-tcp.loadbalancer.server.port=6881"
+
+      - "traefik.udp.routers.qbittorrent-udp.entrypoints=qbittorrent-udp"
+      - "traefik.udp.services.qbittorrent-udp.loadbalancer.server.port=6881"
+
+      - "traefik.docker.network=torrent"
+
+    restart: unless-stopped
+    networks:
+      - torrent
+
+networks:
+  torrent:
+    external: true

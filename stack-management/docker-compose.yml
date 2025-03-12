@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  tunnel:
+    image: cloudflare/cloudflared
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARED_TOKEN}
+      - TUNNEL_LOGLEVEL=debug
+      - TUNNEL_METRICS=0.0.0.0:60123
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - management
+      - monitoring
+
+  traefik:
+    image: traefik:v3.3.4
+    container_name: traefik
+    command:
+      - "--api=true"
+      - "--log.level=debug"
+      - "--providers.docker.exposedByDefault=false"
+      - "--accesslog=true"
+      - "--providers.docker=true"           
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.qbittorrent-tcp.address=:6881"
+      - "--entrypoints.qbittorrent-udp.address=:6881/udp"
+      - "--entrypoints.minecraft.address=:25565"
+      - "--metrics.prometheus=true"
+    ports:
+      - "80:80"    
+      - "443:443"
+      - "6881:6881"      
+      - "6881:6881/udp" 
+      - "25565:25565"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./usersfile:/usersfile     
+    labels:
+      - "traefik.enable=true" 
+      - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
+      - "traefik.http.routers.dashboard.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.middlewares.simpleauth.basicauth.usersfile=./usersfile"
+      - "traefik.http.routers.dashboard.middlewares=simpleauth"
+      - "traefik.http.middlewares.simpleauth.basicauth.removeheader=false"
+    restart: unless-stopped
+    networks:
+      - management
+      - monitoring
+      - torrent
+      - minecraft
+      - pihole
+      - guacamole
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    command: --host=unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock" 
+      - "portainer_data:/data"
+    labels:
+      - "traefik.enable=true" 
+      - "traefik.http.routers.portainer.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
+      - "traefik.http.routers.portainer.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
+      - "traefik.docker.network=management"
+    restart: unless-stopped
+    networks:
+      - management
+
+networks:
+  management:
+    external: true
+  monitoring:
+    external: true
+  torrent:
+    external: true
+  minecraft:
+    external: true
+  pihole:
+    external: true
+  guacamole:
+    external: true
+
+volumes:
+   portainer_data:
