@@ -14,7 +14,7 @@ services:
       - "53:53/udp"
     environment:
       TZ: "${TZ:-Europe/Warsaw}"
-      WEBPASSWORD: ${PIHOLEWEBPASSWORD} 
+      FTLCONF_webserver_api_password: ${PIHOLEWEBPASSWORD} 
     volumes:
       - pihole_etc:/etc/pihole
       - pihole_dnsmasq:/etc/dnsmasq.d
@@ -29,7 +29,7 @@ services:
       - NET_ADMIN 
 
 networks:
-  management:
+  pihole:
     external: true
 
 volumes:
