@@ -5,11 +5,11 @@ services:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
     restart: unless-stopped
-    user: "${PUID}:${GUID}"
+    user: "${PUID:-1000}:${GUID:-1000}"
     volumes:
-      - /mnt/shared/:/srv
-      - /home/wsapon/docker-compose/filebrowser/database.db:/database.db
-      - /home/wsapon/docker-compose/filebrowser/config.json:/config.json
+      - ${BROWSING_PATH}:/srv
+      - ${CONFIG_PATH}/database.db:/database.db
+      - ${CONFIG_PATH}/config.json:/config.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`fb.${HOST}`)"
@@ -19,8 +19,8 @@ services:
       - "traefik.http.services.grafana.loadbalancer.server.port=80"
       - "traefik.docker.network=monitoring"
     environment:
-      - PUID=${PUID}
-      - PGID=${GUID}
+      - PUID=${PUID:-1000}
+      - PGID=${GUID:-1000}
     networks:
       - monitoring
 networks:
