@@ -24,13 +24,12 @@ services:
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
       - "traefik.docker.network=monitoring"
     environment:
-      - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
+      - GUACD_HOSTNAME=guacd
       - MYSQL_HOSTNAME=mysql
       - GUACD_PORT=${GUACD_PORT:-4822}
       - EXTENSION_PRIORITY=mysql
       - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_USER=${MYSQL_USER:-admin}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
     restart: unless-stopped
@@ -42,9 +41,10 @@ services:
     image: mysql/guacamole:latest
     container_name: mysql
     environment:
+      - MYSQL_TCP_PORT=${MYSQL_PORT:-3306}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DATABASE=guacamole
+      - MYSQL_USER=${MYSQL_USER:-admin}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
