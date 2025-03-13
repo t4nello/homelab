@@ -27,7 +27,7 @@ services:
     container_name: prometheus
     volumes:
       - prometheus_data:/prometheus
-      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus:/etc/prometheus/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.${HOST}`)"
