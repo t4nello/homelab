@@ -108,5 +108,6 @@ Then pass the absoluthe path to that directory into the `CONFIG_PATH` environmen
 
 ### Guacamole
 first you need to create image of MySQL image with scripts to create proper database schema and creating 1st user with login `guacadmin` and password `guacadmin`. Iinit scripts and dockerfile content are in the stack-guacamole directory. 
-You can build image via previously deployed portainer or via CLI ` docker build -t mysql/guacamole -f mysql.Dockerfile .`
+You can build image via previously deployed portainer or via CLI 
+` docker build -t mysql/guacamole -f mysql.Dockerfile .`
 
