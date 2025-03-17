@@ -20,11 +20,15 @@ services:
       - pihole_dnsmasq:/etc/dnsmasq.d
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pihole.rule=Host(`pihole.${HOST}`)"
-      - "traefik.http.routers.pihole.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.pihole.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.pihole.rule=Host(`pihole.t4nello.site`)"
+      - "traefik.http.routers.pihole.entrypoints=websecure"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.http.routers.pihole.tls=true"
       - "traefik.docker.network=management"
+      - "traefik.http.middlewares.pihole-redirect.redirectregex.regex=^https?://(.*)/$"
+      - "traefik.http.middlewares.pihole-redirect.redirectregex.replacement=https://$1/admin"
+      - "traefik.http.middlewares.pihole-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.pihole.middlewares=pihole-redirect"
     cap_add:
       - NET_ADMIN 
 
