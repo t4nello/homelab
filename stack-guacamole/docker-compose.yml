@@ -6,7 +6,6 @@ services:
     container_name: guacd
     environment:
       - "GUACD_LOG_LEVEL=debug"
-      - "GUACD_PORT=${GUACD_PORT:-4822}"
     networks:
       - guacd
     volumes:
@@ -17,46 +16,47 @@ services:
     container_name: guacamole
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.guacamole.rule=Host(`guacamole.${HOST}`)"
-      - "traefik.http.routers.guacamole.entryPoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.guacamole.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.guacamole.rule=Host(`guacamole.t4nello.site`)"
+      - "traefik.http.routers.guacamole.entryPoints=websecure"
+      - "traefik.http.routers.guacamole.tls=true"
       - "traefik.http.routers.guacamole.priority=15"
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
       - "traefik.docker.network=monitoring"
     environment:
-      - GUACD_HOSTNAME=guacd
+      - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
       - MYSQL_HOSTNAME=mysql
       - GUACD_PORT=${GUACD_PORT:-4822}
       - EXTENSION_PRIORITY=mysql
       - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_USER=${MYSQL_USER:-admin}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
-    restart: unless-stopped
+    restart: on-failure:5
     networks:
       - guacd
-      - guacamole
+      - monitoring
 
   mysql:
     image: mysql/guacamole:latest
     container_name: mysql
     environment:
-      - MYSQL_TCP_PORT=${MYSQL_PORT:-3306}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=guacamole
-      - MYSQL_USER=${MYSQL_USER:-admin}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
       - guacd
 
 networks:
-  guacamole:
+  monitoring:
     external: true
   guacd:
     driver: bridge
-    name: guacd
+
 
 volumes:
   guacd-record: {}
