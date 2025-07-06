@@ -7,14 +7,14 @@ services:
     hostname: pihole
     restart: unless-stopped
     networks:
-      - dns_net
       - management
     ports:
       - "53:53/tcp" 
       - "53:53/udp"
     environment:
-      TZ: "${TZ:-Europe/Warsaw}"
-      FTLCONF_webserver_api_password: ${PIHOLEWEBPASSWORD} 
+      TZ: "Europe/Warsaw"
+      WEBPASSWORD: ${PIHOLEWEBPASSWORD} 
+
     volumes:
       - pihole_etc:/etc/pihole
       - pihole_dnsmasq:/etc/dnsmasq.d
@@ -25,15 +25,15 @@ services:
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
       - "traefik.http.routers.pihole.tls=true"
       - "traefik.docker.network=management"
-      - "traefik.http.middlewares.pihole-redirect.redirectregex.regex=^https?://(.*)/$"
-      - "traefik.http.middlewares.pihole-redirect.redirectregex.replacement=https://$1/admin"
-      - "traefik.http.middlewares.pihole-redirect.redirectregex.permanent=true"
-      - "traefik.http.routers.pihole.middlewares=pihole-redirect"
     cap_add:
       - NET_ADMIN 
+      - CHOWN
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - CAP_NET_ADMIN
 
 networks:
-  pihole:
+  management:
     external: true
 
 volumes:

@@ -1,0 +1,71 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - network.host=0.0.0.0
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - logging
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kibana.rule=Host(`kibana.${HOST}`)"
+      - "traefik.http.routers.kibana.entryPoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.kibana.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.kibana.priority=15"
+      - "traefik.http.services.kibana.loadbalancer.server.port=5601"
+      - "traefik.docker.network=logging"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - logging
+      - management
+
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:2.2
+    container_name: fluent-bit
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: ["CMD", "fluent-bit", "--dryrun", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - logging
+
+volumes:
+  elasticsearch_data:
+
+networks:
+  logging:
+    external: true
+  management:
+    external: true

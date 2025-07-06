@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.guacamole.tls=true"
       - "traefik.http.routers.guacamole.priority=15"
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
-      - "traefik.docker.network=monitoring"
+      - "traefik.docker.network=management"
     environment:
       - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
       - MYSQL_HOSTNAME=mysql
@@ -36,7 +36,7 @@ services:
     restart: on-failure:5
     networks:
       - guacd
-      - monitoring
+      - management
 
   mysql:
     image: mysql/guacamole:latest
@@ -53,7 +53,7 @@ services:
       - guacd
 
 networks:
-  monitoring:
+  management:
     external: true
   guacd:
     driver: bridge

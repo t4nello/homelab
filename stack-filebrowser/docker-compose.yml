@@ -17,12 +17,12 @@ services:
       - "traefik.http.routers.grafana.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.routers.grafana.priority=15"
       - "traefik.http.services.grafana.loadbalancer.server.port=80"
-      - "traefik.docker.network=monitoring"
+      - "traefik.docker.network=management"
     environment:
       - PUID=${PUID:-1000}
       - PGID=${GUID:-1000}
     networks:
-      - monitoring
+      - management
 networks:
-  monitoring:
+  management:
     external: true 
