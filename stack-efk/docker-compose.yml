@@ -41,7 +41,6 @@ services:
     restart: unless-stopped
     networks:
       - logging
-      - management
 
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:2.2
@@ -66,6 +65,4 @@ volumes:
 
 networks:
   logging:
-    external: true
-  management:
     external: true
