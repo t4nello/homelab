@@ -4,7 +4,7 @@ Set of docker-compose files for my home environment
 ## Stacks and applications
  -  Management
 	 - cloudflared (tunnel)
-	 - cloudflared (proxy-DNS for DOH)
+	 - cloudflared (proxy-DNS for DoH)
 	 -  traefik
 	 - portainer
  - Monitoring
