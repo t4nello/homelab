@@ -49,7 +49,8 @@ services:
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./config/fluent-bit/config.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./config/fluent-bit/parser.conf:/fluent-bit/etc/parser.conf:ro
     depends_on:
       - elasticsearch
     healthcheck:
