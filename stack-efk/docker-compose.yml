@@ -32,7 +32,7 @@ services:
       - "traefik.http.routers.kibana.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.routers.kibana.priority=15"
       - "traefik.http.services.kibana.loadbalancer.server.port=5601"
-      - "traefik.docker.network=logging"
+      - "traefik.docker.network=management"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
       interval: 10s
