@@ -3,13 +3,15 @@
 Set of docker-compose files for my home environment
 ## Stacks and applications
  -  Management
-	 - cloudflared
+	 - cloudflared (tunnel)
+	 - cloudflared (proxy-DNS for DOH)
 	 -  traefik
 	 - portainer
  - Monitoring
 	 - Node-Exporter
 	 - Prometheus
 	 - Grafana
+	 - CAdvisor
  - Filebrowser
 	 - Filebrowser
  - Guacamole
