@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     command: tunnel run
     environment:
-      - TUNNEL_TOKEN=eyJhIjoiZWJhYTdmY2I4NDU0ZjAwMjhiNTkxNzUzZjQ5OTZmM2YiLCJ0IjoiNjljZGIxOGEtMWZlZS00NzA0LWIyYTItMzk3MGM1YjU5MjlmIiwicyI6IlpEVXlNVGhrTjJRdE9UZzRZaTAwTlRZMExXSXlNR1l0WkRCbE56YzRPVEJpTkRZMyJ9
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
       - TUNNEL_LOGLEVEL=debug
       - TUNNEL_METRICS=0.0.0.0:60123
     healthcheck:
@@ -66,8 +66,8 @@ services:
       - ./certs/definition.yml:/etc/traefik/definition.yml  
     labels:
       - "traefik.enable=true" 
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.t4nello.site`)"
+      - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
       - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.middlewares.simpleauth.basicauth.usersfile=./usersfile"
@@ -88,8 +88,8 @@ services:
       - "portainer_data:/data"
     labels:
       - "traefik.enable=true" 
-      - "traefik.http.routers.portainer.entrypoints=websecure"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.t4nello.site`)"
+      - "traefik.http.routers.portainer.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)""
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
       - "traefik.docker.network=management"
