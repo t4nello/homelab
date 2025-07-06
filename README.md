@@ -2,6 +2,10 @@
 
 Set of docker-compose files for my home environment
 ## Stacks and applications
+ -  EFK
+	- ElasticSearch
+	- Fluent-Bit
+	- Kibana
  -  Management
 	 - cloudflared (tunnel)
 	 - cloudflared (proxy-DNS for DoH)
@@ -25,12 +29,19 @@ Set of docker-compose files for my home environment
 
 ## Environment Variables
 
+### EFK
+| Name               | Required? | Allowed Values       | Default Value | Description                                  |
+|--------------------|-----------|----------------------|---------------|----------------------------------------------|
+| TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                   |
+| HOST               | YES       | valid domain address | ------------  | Domain address                               |
+| TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                        |
+---
 ### Management
 | Name               | Required? | Allowed Values       | Default Value | Description                                  |
 |--------------------|-----------|----------------------|---------------|----------------------------------------------|
 | TUNNEL_TOKEN       | YES       | Valid token          | ------------  | Token provided by cloudflare Zero Trust Zone |
 | TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                   |
-| HOST               | YES       | valid domain address | ------------  | Domain address                                 |
+| HOST               | YES       | valid domain address | ------------  | Domain address                               |
 | TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                        |
 ---
 ### Monitoring
