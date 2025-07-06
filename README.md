@@ -35,6 +35,7 @@ Set of docker-compose files for my home environment
 | TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                   |
 | HOST               | YES       | valid domain address | ------------  | Domain address                               |
 | TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                        |
+| ELASTIC_PASSWORD   | YES       | string               | ------------  | ElasticSearch Password                       |
 ---
 ### Management
 | Name               | Required? | Allowed Values       | Default Value | Description                                  |
