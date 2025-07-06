@@ -28,7 +28,7 @@ Set of docker-compose files for my home environment
 ### Management
 | Name               | Required? | Allowed Values       | Default Value | Description                                  |
 |--------------------|-----------|----------------------|---------------|----------------------------------------------|
-| CLOUDFLARED_TOKEN  | YES       | Valid token          | ------------  | Token provided by cloudflare Zero Trust Zone |
+| TUNNEL_TOKEN       | YES       | Valid token          | ------------  | Token provided by cloudflare Zero Trust Zone |
 | TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                   |
 | HOST               | YES       | valid domain address | ------------  | Domain address                                 |
 | TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                        |
