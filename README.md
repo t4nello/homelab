@@ -4,7 +4,7 @@ Set of docker-compose files for my home environment
 ## Stacks and applications
  -  EFK
 	- ElasticSearch
-	- Fluent-Bit
+	- FluentD
 	- Kibana
  -  Management
 	 - cloudflared (tunnel)
