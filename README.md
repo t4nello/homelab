@@ -30,14 +30,13 @@ Set of docker-compose files for my home environment
 ## Environment Variables
 
 ### EFK
-| Name               | Required? | Allowed Values       | Default Value | Description                                   |
-|--------------------|-----------|----------------------|---------------|-----------------------------------------------|
-| TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                    |
-| HOST               | YES       | valid domain address | ------------  | Domain address                                |
-| TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                         |
-| ES_PASSWORD        | YES       | string               | ------------  | ElasticSearch password generated from command 
-																			(see: Additional Info for stacks) |
-| KIBANA_PASSWORD    | YES       | string               | ------------  | Kibana password generated from command        |
+| Name               | Required? | Allowed Values       | Default Value | Description                                   								   |
+|--------------------|-----------|----------------------|---------------|----------------------------------------------------------------------------------|
+| TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                    								   |
+| HOST               | YES       | valid domain address | ------------  | Domain address                                								   |
+| TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                          								   |
+| ES_PASSWORD        | YES       | string               | ------------  | ElasticSearch password generated from command, see: (Additional Info for stacks) |
+| KIBANA_PASSWORD    | YES       | string               | ------------  | Kibana password generated from command, see: (Additional Info for stacks)        |
 ---
 ### Management
 | Name               | Required? | Allowed Values       | Default Value | Description                                  |
