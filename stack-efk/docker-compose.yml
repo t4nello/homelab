@@ -1,14 +1,25 @@
 services:
+  fluentd:
+    image: fluentd-plugins:latest
+    container_name: fluentd
+    user: root
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_DIR}/fluentd/fluent.conf:/fluentd/etc/fluent.conf
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+    networks:
+      - logging
+
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    image: elasticsearch:9.0.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
-      - xpack.security.transport.ssl.enabled=false
-      - network.host=0.0.0.0
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
     volumes:
+      - ${CONFIG_DIR}/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - elasticsearch_data:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
@@ -16,14 +27,17 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    mem_limit: 1024m
     networks:
       - logging
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.4
+    image: kibana:9.0.2
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ${CONFIG_DIR}/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
     labels:
@@ -44,26 +58,9 @@ services:
       - logging
       - management
 
-  fluent-bit:
-    image: cr.fluentbit.io/fluent/fluent-bit:2.2
-    container_name: fluent-bit
-    volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/fluent-bit/config.conf:/fluent-bit/etc/fluent-bit.conf:ro
-    depends_on:
-      - elasticsearch
-    healthcheck:
-      test: ["CMD", "fluent-bit", "--dryrun", "-c", "/fluent-bit/etc/fluent-bit.conf"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    restart: unless-stopped
-    networks:
-      - logging
-
 volumes:
   elasticsearch_data:
+    name: elasticsearch_data
 
 networks:
   logging:
