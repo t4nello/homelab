@@ -30,12 +30,14 @@ Set of docker-compose files for my home environment
 ## Environment Variables
 
 ### EFK
-| Name               | Required? | Allowed Values       | Default Value | Description                                  |
-|--------------------|-----------|----------------------|---------------|----------------------------------------------|
-| TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                   |
-| HOST               | YES       | valid domain address | ------------  | Domain address                               |
-| TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                        |
-| ELASTIC_PASSWORD   | YES       | string               | ------------  | ElasticSearch Password                       |
+| Name               | Required? | Allowed Values       | Default Value | Description                                   |
+|--------------------|-----------|----------------------|---------------|-----------------------------------------------|
+| TRAEFIK_ENTRYPOINT | NO        | web/websecure        | websecure     | Entrypoint of the services                    |
+| HOST               | YES       | valid domain address | ------------  | Domain address                                |
+| TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS                         |
+| ES_PASSWORD        | YES       | string               | ------------  | ElasticSearch password generated from command 
+																			(see: Additional Info for stacks) |
+| KIBANA_PASSWORD    | YES       | string               | ------------  | Kibana password generated from command        |
 ---
 ### Management
 | Name               | Required? | Allowed Values       | Default Value | Description                                  |
@@ -94,7 +96,7 @@ Set of docker-compose files for my home environment
 | TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS      
  |
   ---
-## Additional Info for each stack
+## Additional Info for stacks
 First stack to be deployed is management, then the of deployment doesn't matter
 ### Management
 Install ```apache2-utils``` package to generate password for Traefik/Prometheus
@@ -129,4 +131,4 @@ You can build image via previously deployed portainer or via CLI
 To generate passwords for kibana and fluend you have to:
 1. `docker exec -it <elastic_container_id> /bin/sh`
 2. `bash bin/elasticsearch-setup-passwords auto`
-3. Passwords will generate, fill them in configuration files 
+3. Passwords will generate, fill them in stack envs
