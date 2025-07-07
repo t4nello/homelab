@@ -125,3 +125,8 @@ first you need to create image of MySQL image with scripts to create proper data
 You can build image via previously deployed portainer or via CLI 
 ` docker build -t mysql/guacamole -f mysql.Dockerfile .`
 
+### EFK
+To generate passwords for kibana and fluend you have to:
+1. `docker exec -it <elastic_container_id> /bin/sh`
+2. `bash bin/elasticsearch-setup-passwords auto`
+3. Passwords will generate, fill them in configuration files 
