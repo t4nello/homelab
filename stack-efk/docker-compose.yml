@@ -6,7 +6,7 @@ services:
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CONFIG_DIR}/fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      - ./config/fluentd/fluent.conf:/fluentd/etc/fluent.conf
     depends_on:
       - elasticsearch
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
     environment:
       - discovery.type=single-node
     volumes:
-      - ${CONFIG_DIR}/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./config/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - elasticsearch_data:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
@@ -37,7 +37,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     volumes:
-      - ${CONFIG_DIR}/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
     labels:
