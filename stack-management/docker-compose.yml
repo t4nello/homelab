@@ -89,7 +89,7 @@ services:
     labels:
       - "traefik.enable=true" 
       - "traefik.http.routers.portainer.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)""
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
       - "traefik.docker.network=management"
