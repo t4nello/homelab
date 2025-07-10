@@ -14,7 +14,6 @@ services:
     environment:
       TZ: "Europe/Warsaw"
       WEBPASSWORD: ${PIHOLEWEBPASSWORD} 
-
     volumes:
       - pihole_etc:/etc/pihole
       - pihole_dnsmasq:/etc/dnsmasq.d

@@ -23,9 +23,6 @@ services:
     image: cloudflare/cloudflared
     container_name: cloudflaredns
     restart: unless-stopped
-    ports:
-      - "5053:5053/udp"
-      - "5053:5053/tcp"
     environment:
       - TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query
       - TUNNEL_DNS_PORT=5053
@@ -54,8 +51,6 @@ services:
       - "--entrypoints.minecraft.address=:25565"
       - "--metrics.prometheus=true"
     ports:
-      - "80:80"    
-      - "443:443"
       - "6881:6881"      
       - "6881:6881/udp" 
       - "25565:25565"
