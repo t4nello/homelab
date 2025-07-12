@@ -1,0 +1,6 @@
+.env
+usersfile
+*/.env
+*/usersfile
+**/.env
+**/usersfile
