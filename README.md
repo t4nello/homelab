@@ -110,13 +110,13 @@ git clone <repo_url>
 ### 2. Navigate to the management stack directory
 
 ```bash
-cd homelab/stack-managament
+cd homelab/stack-management
 ```
 
 ### 3. Create necessary Docker networks
 
 ```bash
-docker network create --opt com.docker.network.bridge.name=managament managament
+docker network create --opt com.docker.network.bridge.name=management management
 docker network create --opt com.docker.network.bridge.name=monitoring monitoring
 docker network create --opt com.docker.network.bridge.name=torrent torrent
 docker network create --opt com.docker.network.bridge.name=guacd guacd
@@ -124,7 +124,13 @@ docker network create --opt com.docker.network.bridge.name=guacd guacd
 
 ### 4. Create a `.env` file
 
-Create a `.env` file in the `stack-managament` directory and define the required environment variables.
+Create a `.env` file in the `stack-management` directory and define the required environment variables.
+example:
+```bash
+HOST=example.com
+TRAEFIK_TLS=true
+TRAEFIK_ENTRYPOINT=websecure
+```
 
 ### 5. Install `apache2-utils` to generate password file for Traefik/Prometheus
 
@@ -144,7 +150,7 @@ docker-compose -f docker-compose-management.yml -p management up -d
 Navigate to:
 
 ```
-http://portainer.<host>
+[http://portainer.<host>](http://portainer.<your-domain>)
 ```
 
 and log in.
