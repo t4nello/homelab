@@ -1,3 +1,4 @@
+
 # HomeLab
 
 Set of docker-compose files for my home environment.
@@ -212,14 +213,14 @@ Since a bridge network is used, WoL packets must be routed to your home LAN.
 1. Move the `wol-relay.sh` script to `/usr/bin/` and make it executable:
 
 ```bash
-sudo mv <repo>/stack-guacamole/wol-relay.sh /usr/bin/wol-relay.sh
+sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.sh /usr/bin/wol-relay.sh
 sudo chmod +x /usr/bin/wol-relay.sh
 ```
 
 2. Move the `wol-relay.service` file to the systemd directory:
 
 ```bash
-sudo mv <repo>/stack-guacamole/wol-relay.service /etc/systemd/system/
+sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.service /etc/systemd/system/
 ```
 
 3. Enable and start the service:
