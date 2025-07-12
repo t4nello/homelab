@@ -150,7 +150,7 @@ docker-compose -f docker-compose-management.yml -p management up -d
 Navigate to:
 
 ```
-[http://portainer.<host>](http://portainer.<your-domain>)
+portainer.<your-domain>
 ```
 
 and log in.
