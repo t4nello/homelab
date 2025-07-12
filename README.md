@@ -55,15 +55,15 @@ Set of docker-compose files for my home environment
 | TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS      |
 ---
 ### Filebrowser
-| Name               | Required? | Allowed Values             | Default Value | Description                                                    |
-|--------------------|-----------|----------------------------|---------------|----------------------------------------------------------------|
-| PUID               | NO        | valid user ID              | 1000          | User ID                                                        |
-| GUID               | NO        | valid group ID             | 1000          | Group ID                                                       |
-| BROWSING_PATH      | YES       | absolute path to directory | ------        | Path to directory                                              |
+| Name               | Required? | Allowed Values             | Default Value | Description                                                          |
+|--------------------|-----------|----------------------------|---------------|----------------------------------------------------------------------|
+| PUID               | NO        | valid user ID              | 1000          | User ID                                                              |
+| GUID               | NO        | valid group ID             | 1000          | Group ID                                                             |
+| BROWSING_PATH      | YES       | absolute path to directory | ------        | Path to directory                                                    |
 | CONFIG_PATH        | YES       | absolute path to config    | ------        | Path to config directory with config.json and empty database.db file |
-| TRAEFIK_ENTRYPOINT | NO        | web/websecure              | websecure     | Entrypoint of the services                                     |
-| HOST               | YES       | valid domain address       | ------------  | Domain address                                                 |
-| TRAEFIK_TLS        | NO        | true/false                 | true          | Enable or disable TLS                                          |
+| TRAEFIK_ENTRYPOINT | NO        | web/websecure              | websecure     | Entrypoint of the services                                           |
+| HOST               | YES       | valid domain address       | ------------  | Domain address                                                       |
+| TRAEFIK_TLS        | NO        | true/false                 | true          | Enable or disable TLS                                                |
 ---
 ### Guacamole
 | Name                | Required? | Allowed Values       | Default Value | Description                |
@@ -97,23 +97,64 @@ Set of docker-compose files for my home environment
  |
   ---
  
- # Deployment
- 1. Clone repository
- 2. Go to the management-stack directory ``cd homelab/stack-managament``
- 3. Create necessary networks
-	 ``` docker network create --opt com.docker.network.bridge.name=managament managament  ```
-	 ``` docker network create --opt com.docker.network.bridge.name=monitoring monitoring  ```
-	 ``` docker network create --opt com.docker.network.bridge.name=torrent torrent ```
-	 ``` docker network create --opt com.docker.network.bridge.name=guacd guacd```
-	 ``` docker network create --opt com.docker.network.bridge.name=torrent torrent```
- 4. Create `.env` file in the stack-management directory and pass necessary environment variables there
- 5.  Install ```apache2-utils``` package to generate password for Traefik/Prometheus
-	``htpasswd -Bc -C 6 <path/to/managament/compose>/usersfile <username``
- 6. Deploy this stack by using 
-	`` docker-compose -f docker-compose-management.yml -p management up -d ``
-7. login to portainer using `portainer.<host>`
-8. Deploy other stacks using Portainer based on info from `Additional Info for stacks` section.
+
+
+## Deployment
+
+### 1. Clone the repository
+
+```bash
+git clone <repo_url>
+```
+
+### 2. Navigate to the management stack directory
+
+```bash
+cd homelab/stack-managament
+```
+
+### 3. Create necessary Docker networks
+
+```bash
+docker network create --opt com.docker.network.bridge.name=managament managament
+docker network create --opt com.docker.network.bridge.name=monitoring monitoring
+docker network create --opt com.docker.network.bridge.name=torrent torrent
+docker network create --opt com.docker.network.bridge.name=guacd guacd
+```
+
+### 4. Create a `.env` file
+
+Create a `.env` file in the `stack-managament` directory and define the required environment variables.
+
+### 5. Install `apache2-utils` to generate password file for Traefik/Prometheus
+
+```bash
+sudo apt install apache2-utils
+htpasswd -Bc -C 6 <path/to/management/compose>/usersfile <username>
+```
+
+### 6. Deploy the management stack
+
+```bash
+docker-compose -f docker-compose-management.yml -p management up -d
+```
+
+### 7. Log in to Portainer
+
+Navigate to:
+
+```
+http://portainer.<host>
+```
+
+and log in.
+
+### 8. Deploy additional stacks
+
+Use Portainer to deploy other stacks. Refer to the **"Additional Info for stacks"** section for details.
+
 ## Additional Info for stacks
+
 ### File Browser
 You should create a directory that includes files `config.json` with example value:
 ```bash
@@ -140,7 +181,7 @@ To achieve this, you must place the scripts from the `homelab/stack-guacamole/wo
 Root privileges are required.
 
 ---
-### Steps:
+##### Steps:
 1.  **Move the `wol-relay.sh` script** to `/usr/bin/` and make it executable:
 	```bash
 	sudo mv <path/to/cloned/repo>/stack-guacamole/wol-relay.sh /usr/bin/wol-relay.sh
