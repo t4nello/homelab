@@ -1,3 +1,4 @@
+
 # HomeLab
 
 Set of docker-compose files for my home environment
@@ -58,8 +59,8 @@ Set of docker-compose files for my home environment
 |--------------------|-----------|----------------------------|---------------|----------------------------------------------------------------|
 | PUID               | NO        | valid user ID              | 1000          | User ID                                                        |
 | GUID               | NO        | valid group ID             | 1000          | Group ID                                                       |
-| BROWSING_PATH      | YES       | absloute path to directory | ------        | Path to directory                                              |
-| CONFIG_PATH        | YES       | absloute path to config    | ------        | Path to config dir with config.json and empty database.db file |
+| BROWSING_PATH      | YES       | absolute path to directory | ------        | Path to directory                                              |
+| CONFIG_PATH        | YES       | absolute path to config    | ------        | Path to config directory with config.json and empty database.db file |
 | TRAEFIK_ENTRYPOINT | NO        | web/websecure              | websecure     | Entrypoint of the services                                     |
 | HOST               | YES       | valid domain address       | ------------  | Domain address                                                 |
 | TRAEFIK_TLS        | NO        | true/false                 | true          | Enable or disable TLS                                          |
@@ -95,19 +96,26 @@ Set of docker-compose files for my home environment
 | TRAEFIK_TLS        | NO        | true/false           | true          | Enable or disable TLS      
  |
   ---
+ 
+ # Deployment
+ 1. Clone repository
+ 2. Go to the management-stack directory ``cd homelab/stack-managament``
+ 3. Create necessary networks
+	 ``` docker network create --opt com.docker.network.bridge.name=managament managament  ```
+	 ``` docker network create --opt com.docker.network.bridge.name=monitoring monitoring  ```
+	 ``` docker network create --opt com.docker.network.bridge.name=torrent torrent ```
+	 ``` docker network create --opt com.docker.network.bridge.name=guacd guacd```
+	 ``` docker network create --opt com.docker.network.bridge.name=torrent torrent```
+ 4. Create `.env` file in the stack-management directory and pass necessary environment variables there
+ 5.  Install ```apache2-utils``` package to generate password for Traefik/Prometheus
+	``htpasswd -Bc -C 6 <path/to/managament/compose>/usersfile <username``
+ 6. Deploy this stack by using 
+	`` docker-compose -f docker-compose-management.yml -p management up -d ``
+7. login to portainer using `portainer.<host>`
+8. Deploy other stacks using Portainer based on info from `Additional Info for stacks` section.
 ## Additional Info for stacks
-First stack to be deployed is management, then the of deployment doesn't matter
-### Management
-Install ```apache2-utils``` package to generate password for Traefik/Prometheus
-```bash
-htpasswd -Bc -C 6 <path/to/managament/compose>/usersfile <username>
-```
-After that you can deploy this stack by using 
-```bash 
-docker-compose -f docker-compose-management.yml -p management up -d 
-```
 ### File Browser
-You should create directory that includes files `config.json` with expample value:
+You should create a directory that includes files `config.json` with example value:
 ```bash
 {
     "port": 80,
@@ -119,13 +127,39 @@ You should create directory that includes files `config.json` with expample valu
   }
 ```
 and empty `database.db`	file
-Then pass the absoluthe path to that directory into the `CONFIG_PATH` environment variable
+Then pass the absolute path to that directory into the `CONFIG_PATH` environment variable
 
 ### Guacamole
 first you need to create image of MySQL image with scripts to create proper database schema and creating 1st user with login `guacadmin` and password `guacadmin`. Iinit scripts and dockerfile content are in the stack-guacamole directory. 
 You can build image via previously deployed portainer or via CLI 
 ` docker build -t mysql/guacamole -f mysql.Dockerfile .`
+#### Wake-on-LAN (WoL) Setup for Guacamole (version 1.5.5)
+**Note:** As of 12.07.2025, it is recommended to use Guacamole version **1.5.5** for WoL functionality because version **1.6.0** has uknown issues preventing WoL from working.
+Since the stack uses a **bridge network**, WoL packets need to be properly routed to your home LAN.
+To achieve this, you must place the scripts from the `homelab/stack-guacamole/wolscripts` directory into appropriate locations on the host machine.
+Root privileges are required.
 
+---
+### Steps:
+1.  **Move the `wol-relay.sh` script** to `/usr/bin/` and make it executable:
+	```bash
+	sudo mv <path/to/cloned/repo>/stack-guacamole/wol-relay.sh /usr/bin/wol-relay.sh
+	sudo chmod +x /usr/bin/wol-relay.sh
+	```
+2.  **Move the `wol-relay.service` file** to the systemd directory:
+	```bash 
+	sudo mv <path/to/cloned/repo>/stack-guacamole/wol-relay.service /etc/systemd/system/
+	```
+3.  **Enable and start the service:**
+	```bash
+	sudo systemctl enable wol-relay.service
+	sudo systemctl start wol-relay.service
+	```
+4.  **Check the service status:**
+	```bash
+	sudo systemctl status wol-relay.service
+	```
+---
 ### EFK
 To generate passwords for kibana and fluend you have to:
 1. `docker exec -it <elastic_container_id> /bin/sh`
