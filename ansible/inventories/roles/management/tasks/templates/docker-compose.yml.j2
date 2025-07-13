@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     command: tunnel run
     environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+      - TUNNEL_TOKEN={{ tunnel_token }}
       - TUNNEL_LOGLEVEL=debug
       - TUNNEL_METRICS=0.0.0.0:60123
     healthcheck:
@@ -18,7 +18,7 @@ services:
     networks:
       - management
       - monitoring
-  
+
   cloudflared:
     image: cloudflare/cloudflared
     container_name: cloudflaredns
@@ -61,8 +61,8 @@ services:
       - ./certs/definition.yml:/etc/traefik/definition.yml  
     labels:
       - "traefik.enable=true" 
-      - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
+      - "traefik.http.routers.dashboard.entrypoints={{ traefik_entrypoint }}"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.{{ host }}`)"
       - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.middlewares.simpleauth.basicauth.usersfile=./usersfile"
@@ -75,16 +75,19 @@ services:
       - torrent
 
   portainer:
-    image: portainer/portainer-${PORTAINER_EDITION}:latest
+    image: portainer/portainer-{{ portainer_edition }}:latest
     container_name: portainer
-    command: --host=unix:///var/run/docker.sock --admin-password-file=${PORTAINER_PASSWORD} --license-key=${PORTAINER_LICENCE_KEY}
+    command: >
+      --host=unix:///var/run/docker.sock
+      --admin-password-file={{ portainer_password_bcrypt }}
+      {% if portainer_edition == 'ee' %}--license-key={{ portainer_licence_key }}{% endif %}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" 
       - "portainer_data:/data"
     labels:
       - "traefik.enable=true" 
-      - "traefik.http.routers.portainer.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
+      - "traefik.http.routers.portainer.entrypoints={{ traefik_entrypoint }}"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.{{ host }}`)"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
       - "traefik.docker.network=management"
@@ -101,4 +104,4 @@ networks:
     external: true
 
 volumes:
-   portainer_data:
+  portainer_data:

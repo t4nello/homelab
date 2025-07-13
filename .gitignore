@@ -4,3 +4,4 @@ usersfile
 */usersfile
 **/.env
 **/usersfile
+**/secrets/*

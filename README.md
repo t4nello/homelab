@@ -51,12 +51,15 @@ Set of docker-compose files for my home environment.
 
 ### Management
 
-| Name                | Required? | Allowed Values         | Default Value | Description                                  |
-| ------------------- | --------- | ---------------------- | ------------- | -------------------------------------------- |
-| TUNNEL\_TOKEN       | YES       | Valid token            |               | Token provided by Cloudflare Zero Trust Zone |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services                   |
-| HOST                | YES       | a valid domain address |               | Domain address                               |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS                        |
+| Name                    | Required?                          | Allowed Values                   | Default Value | Description                                                 |
+| ----------------------- | ---------------------------------- | -------------------------------- | ------------- | ----------------------------------------------------------- |
+| TUNNEL\_TOKEN           | YES                                | String                           |               | Token provided by Cloudflare Zero Trust Zone                |
+| TRAEFIK\_ENTRYPOINT     | NO                                 | web/websecure                    | websecure     | Entrypoint of the services                                  | 
+| HOST                    | YES                                | A valid domain address           |               | Domain address                                              |
+| TRAEFIK\_TLS            | NO                                 | true/false                       | true          | Enable or disable TLS                                       |
+| PORTAINER\_EDITION      | NO                                 | ce/ee                            | ce            | Determines the community or enterprise version of Portainer |
+| PORTAINER\_PASSWORD     | YES                                | String                           |               | Password for portainer WebGui password                      |
+| PORTAINER\_LICENCE\_KEY | if PORTAINER\_EDITION is set to ee | String                           |               | Portainer EE licence key                                    |
 
 ### Monitoring
 

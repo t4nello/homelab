@@ -1,0 +1,7 @@
+- name: Deploy stack Management
+  hosts: homelab
+  become: yes
+  vars_files:
+    - secrets/management.yml
+  roles:
+    - management

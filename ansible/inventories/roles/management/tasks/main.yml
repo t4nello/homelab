@@ -1,0 +1,25 @@
+- name: Tworzy katalog z docker-compose
+  file:
+    path: "{{ deploy_path }}"
+    state: directory
+    recurse: yes
+
+- name: Wygeneruj plik .env
+  template:
+    src: ".env.j2"
+    dest: "{{ deploy_path }}/.env"
+    mode: '0640'
+
+- name: Wygeneruj docker-compose.yml
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ deploy_path }}/docker-compose.yml"
+    mode: '0644'
+
+- name: Wygeneruj usersfile
+  include_tasks: usersfile.yml
+
+- name: Uruchom stack docker-compose
+  community.docker.docker_compose:
+    project_src: "{{ deploy_path }}"
+    state: present

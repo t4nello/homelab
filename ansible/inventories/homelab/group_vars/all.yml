@@ -1,0 +1,4 @@
+traefik_entrypoint: websecure
+traefik_tls: true
+portainer_edition: ce
+deploy_path: /opt/management
