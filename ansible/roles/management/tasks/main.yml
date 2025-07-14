@@ -10,7 +10,7 @@
     - { name: "monitoring", bridge: "monitoring" }
     - { name: "torrent", bridge: "torrent" }
     - { name: "guacd", bridge: "guacd" }
-  become: true
+
 
 - name: Create docker deploy path
   file:
@@ -24,25 +24,37 @@
     dest: "{{ deploy_path }}/.env"
     mode: '0640'
 
-- name: Generate docker-compose
-  template:
-    src: "docker-compose.yml.j2"
-    dest: "{{ deploy_path }}/docker-compose.yml"
-    mode: '0644'
-
-- name: Generate portainer password
+- name: Generate portainer password (raw)
   community.general.htpasswd:
-    path: "{{ deploy_path }}/management/portainer_password_file"
+    path: "{{ deploy_path }}/management/portainer_password_file.raw"
+    hash_scheme: "bcrypt"
     name: admin
     password: "{{ portainer_password }}"
     mode: '0640'
 
+- name: Slurp bcrypt password
+  ansible.builtin.slurp:
+    src: "{{ deploy_path }}/management/portainer_password_file.raw"
+  register: passwordfile
+
+- name: Set fact with escaped bcrypt password
+  set_fact:
+    portainer_password_bcrypt_escaped: >-
+      {{ (passwordfile.content | b64decode).split(':', 1)[1] | replace('$', '$$') | trim }}
+  
 - name: Generate Traefik password
   community.general.htpasswd:
     path: "{{ deploy_path }}/management/usersfile"
     name: admin
     password: "{{ traefik_password }}"
     mode: '0640'
+
+
+- name: Generate docker-compose
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ deploy_path }}/docker-compose.yml"
+    mode: '0644'
 
 - name: Uruchom stack docker-compose
   community.docker.docker_compose:

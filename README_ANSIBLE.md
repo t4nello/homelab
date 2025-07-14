@@ -6,3 +6,7 @@ ansible-vault create --vault-password-file homelab/ansible/secrets/.vault_pass.t
 
  ANSIBLE_VAULT_PASSWORD_FILE=secrets/.vault_pass.txt ansible-playbook playbooks/deploy-management.yml
    88  ANSIBLE_VAULT_PASSWORD_FILE=secrets/.vault_pass.txt ansible-playbook playbooks/deploy-management.yml -vvv
+
+
+
+   ansible-vault create --vault-password-file secrets/.vault_pass.txt --encrypt-vault-id management secrets/management.yml

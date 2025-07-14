@@ -2,7 +2,7 @@
   hosts: localhost
   connection: local
   vars_files:
-    - inventories/homelab/group_vars/all.yml
+    - ../inventories/homelab/group_vars/management.yml
     - ../secrets/management.yml
   roles:
     - management

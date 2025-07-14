@@ -56,14 +56,14 @@ services:
       - "25565:25565"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - ./usersfile:/usersfile
+      - ./management/usersfile:/usersfile
       - ./certs:/certs
       - ./certs/definition.yml:/etc/traefik/definition.yml  
     labels:
       - "traefik.enable=true" 
-      - "traefik.http.routers.dashboard.entrypoints={{ traefik_entrypoint }}"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.{{ host }}`)"
-      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
+      - "traefik.http.routers.dashboard.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.middlewares.simpleauth.basicauth.usersfile=./usersfile"
       - "traefik.http.routers.dashboard.middlewares=simpleauth"
@@ -75,20 +75,25 @@ services:
       - torrent
 
   portainer:
-    image: portainer/portainer-{{ portainer_edition }}:latest
+    image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
     container_name: portainer
-    command: >
-      --host=unix:///var/run/docker.sock
-      --admin-password-file=portainer_password_file
-      {% if portainer_edition == 'ee' %}--license-key={{ portainer_licence_key }}{% endif %}
+    command:
+      - "--host=unix:///var/run/docker.sock"
+      - "--admin-password={{portainer_password_bcrypt_escaped}}"
+    {% if portainer_edition == 'ee' %}
+      - "--license-key={{ portainer_licence_key }}"
+    {% endif %}
+    ports:
+      - "9000:9000"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" 
       - "portainer_data:/data"
+      - ./management/portainer_password_file:/portainer_password_file
     labels:
       - "traefik.enable=true" 
-      - "traefik.http.routers.portainer.entrypoints={{ traefik_entrypoint }}"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.{{ host }}`)"
-      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
+      - "traefik.http.routers.portainer.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
       - "traefik.docker.network=management"
     restart: unless-stopped
