@@ -1,7 +1,0 @@
-- name: Tworzy plik usersfile dla Traefika
-  copy:
-    content: "admin:{{ portainer_password_bcrypt }}"
-    dest: "{{ deploy_path }}/usersfile"
-    owner: root
-    group: root
-    mode: '0600'

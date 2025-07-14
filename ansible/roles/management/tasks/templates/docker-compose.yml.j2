@@ -79,7 +79,7 @@ services:
     container_name: portainer
     command: >
       --host=unix:///var/run/docker.sock
-      --admin-password-file={{ portainer_password_bcrypt }}
+      --admin-password-file=portainer_password_file
       {% if portainer_edition == 'ee' %}--license-key={{ portainer_licence_key }}{% endif %}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" 

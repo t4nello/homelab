@@ -1,7 +1,8 @@
 - name: Deploy stack Management
-  hosts: homelab
-  become: yes
+  hosts: localhost
+  connection: local
   vars_files:
-    - secrets/management.yml
+    - inventories/homelab/group_vars/all.yml
+    - ../secrets/management.yml
   roles:
     - management

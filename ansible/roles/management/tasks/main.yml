@@ -1,0 +1,50 @@
+- name: Create custom Docker networks
+  community.docker.docker_network:
+    name: "{{ item.name }}"
+    driver: bridge
+    driver_options:
+      com.docker.network.bridge.name: "{{ item.bridge }}"
+    state: present
+  loop:
+    - { name: "management", bridge: "management" }
+    - { name: "monitoring", bridge: "monitoring" }
+    - { name: "torrent", bridge: "torrent" }
+    - { name: "guacd", bridge: "guacd" }
+  become: true
+
+- name: Create docker deploy path
+  file:
+    path: "{{ deploy_path }}"
+    state: directory
+    recurse: yes
+
+- name: Create environment file
+  template:
+    src: ".env.j2"
+    dest: "{{ deploy_path }}/.env"
+    mode: '0640'
+
+- name: Generate docker-compose
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ deploy_path }}/docker-compose.yml"
+    mode: '0644'
+
+- name: Generate portainer password
+  community.general.htpasswd:
+    path: "{{ deploy_path }}/management/portainer_password_file"
+    name: admin
+    password: "{{ portainer_password }}"
+    mode: '0640'
+
+- name: Generate Traefik password
+  community.general.htpasswd:
+    path: "{{ deploy_path }}/management/usersfile"
+    name: admin
+    password: "{{ traefik_password }}"
+    mode: '0640'
+
+- name: Uruchom stack docker-compose
+  community.docker.docker_compose:
+    project_src: "{{ deploy_path }}/management"
+    state: present
