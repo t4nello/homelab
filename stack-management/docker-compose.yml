@@ -63,7 +63,7 @@ services:
       - "traefik.enable=true" 
       - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
-      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.middlewares.simpleauth.basicauth.usersfile=./usersfile"
       - "traefik.http.routers.dashboard.middlewares=simpleauth"
@@ -85,7 +85,7 @@ services:
       - "traefik.enable=true" 
       - "traefik.http.routers.portainer.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
       - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
-      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
       - "traefik.docker.network=management"
     restart: unless-stopped
