@@ -1,0 +1,2 @@
+CONFIG_PATH: /srv/qbittorrent/config
+DOWNLOAD_PATH: /srv/qbittorrent/downloads

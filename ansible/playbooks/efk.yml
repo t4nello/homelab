@@ -1,0 +1,19 @@
+# playbooks/efk.yml
+
+- name: Deploy EFK Stack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - ../inventories/homelab/group_vars/efk.yml
+    - ../secrets/efk.yml
+
+  vars:
+    portainer_username: "admin"
+    portainer_password: "admin123admin"
+    portainer_host: "127.0.0.1"
+    endpoint_id: 1
+
+  roles:
+    - efk

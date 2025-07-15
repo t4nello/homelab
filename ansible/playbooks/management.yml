@@ -1,4 +1,4 @@
-- name: Deploy stack Management
+- name: Deploy Management Stack
   hosts: localhost
   connection: local
   vars_files:

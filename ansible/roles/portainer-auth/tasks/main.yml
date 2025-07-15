@@ -1,0 +1,14 @@
+- name: Login to Portainer
+  uri:
+    url: "http://{{ portainer_host }}:9000/api/auth"
+    method: POST
+    body_format: json
+    body:
+      Username: "{{ portainer_username }}"
+      Password: "{{ portainer_password }}"
+    status_code: 200
+  register: login_response
+
+- name: Set Portainer token
+  set_fact:
+    portainer_token: "{{ login_response.json.jwt }}"

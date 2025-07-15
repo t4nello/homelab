@@ -1,0 +1,8 @@
+- name: Deploy Torrent Stack
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ../inventories/homelab/group_vars/torrent.yml
+    - ../secrets/torrent.yml
+  roles:
+    - torrent

@@ -10,6 +10,7 @@
     - { name: "monitoring", bridge: "monitoring" }
     - { name: "torrent", bridge: "torrent" }
     - { name: "guacd", bridge: "guacd" }
+    - { name: "logging", bridge: "logging" }
 
 
 - name: Create docker deploy path

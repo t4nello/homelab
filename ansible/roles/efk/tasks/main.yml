@@ -1,0 +1,90 @@
+- name: Get Portainer token
+  import_role:
+    name: portainer-auth
+
+- name: Template temporary EFK compose file
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "/tmp/efk-temp.yml"
+
+- name: Build fluentd-plugins image from fluent.Dockerfile
+  docker_image:
+    name: fluentd-plugins
+    tag: latest
+    build:
+      path: "{{ role_path }}/templates"
+      dockerfile: fluentd.Dockerfile
+    force_source: true
+    source: build
+
+
+- name: Deploy final EFK stack (inline stack string)
+  uri:
+    url: "http://{{ portainer_host }}:9000/api/stacks/create/standalone/string?endpointId={{ endpoint_id }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: "efk"
+      stackFileContent: "{{ lookup('template', '../templates/docker-compose.yml.j2') }}"
+      composeFormat: "3"
+    status_code: [200, 409]
+
+
+- name: Wait until Elasticsearch container is running
+  shell: docker ps --filter "name=elasticsearch" --filter "status=running" --format "{{ '{{' }}.Names{{ '}}' }}"
+  register: es_container_check
+  until: es_container_check.stdout_lines | length > 0
+  retries: 20
+  delay: 3
+  changed_when: false
+
+- name: Reset elastic password
+  command: docker exec elasticsearch bin/elasticsearch-reset-password -u elastic -b
+  register: es_password_output
+  changed_when: true
+
+- name: Extract elastic password
+  set_fact:
+    es_password: "{{ es_password_output.stdout | regex_search('New value: (.*)', '\\1') | first }}"
+
+- name: Reset kibana password
+  command: docker exec elasticsearch bin/elasticsearch-reset-password -u kibana_system -b
+  register: kibana_password_output
+  changed_when: true
+
+- name: Extract kibana password
+  set_fact:
+    kibana_password: "{{ kibana_password_output.stdout | regex_search('New value: (.*)', '\\1') | first }}"
+
+- name: Save passwords to Vault
+  copy:
+    dest: "../secrets/efk.yml"
+    content: |
+      es_password: "{{ es_password }}"
+      kibana_password: "{{ kibana_password }}"
+    mode: "0600"
+
+- name: Remove EFK stack
+  uri:
+    url: "http://{{ portainer_host }}:9000/api/stacks/efk"
+    method: DELETE
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+    status_code: 204,404
+
+- name: Deploy final EFK stack (with real secrets)
+  uri:
+    url: "http://{{ portainer_host }}:9000/api/stacks"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+    body_format: json
+    body:
+      Name: "efk"
+      StackFileContent: "{{ lookup('template', 'docker-compose.yml.j2') }}"
+      EndpointID: "{{ endpoint_id }}"
+      ComposeFormat: "3"
+    status_code: 200,409
