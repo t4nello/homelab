@@ -3,6 +3,7 @@
   connection: local
   vars_files:
     - ../inventories/homelab/group_vars/management.yml
+    - ../inventories/homelab/group_vars/common.yml
     - ../secrets/management.yml
   roles:
     - management

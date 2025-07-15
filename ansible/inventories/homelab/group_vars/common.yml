@@ -1,4 +1,4 @@
 HOST : localhost
 TRAEFIK_ENTRYPOINT: websecure
 TRAEFIK_TLS: true
-DEPLOY_PATH: /home/wsapon/test
+DEPLOY_PATH: /home/wsapon/deploy_test

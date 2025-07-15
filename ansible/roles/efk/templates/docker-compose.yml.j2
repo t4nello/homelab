@@ -8,7 +8,7 @@ services:
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      -  {{DEPLOY_PATH}}/efk-stack/config/fluentd/fluent.conf:/fluentd/etc/fluent.conf
     depends_on:
       - elasticsearch
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
     environment:
       - discovery.type=single-node
     volumes:
-      - ./config/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      -  {{DEPLOY_PATH}}/efk-stack/config/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - elasticsearch_data:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
@@ -40,7 +40,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
     volumes:
-      - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      -  {{DEPLOY_PATH}}/efk-stack/config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
     labels:

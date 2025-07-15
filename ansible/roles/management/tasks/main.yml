@@ -15,49 +15,49 @@
 
 - name: Create docker deploy path
   file:
-    path: "{{ deploy_path }}"
+    path: "{{ DEPLOY_PATH }}"
     state: directory
     recurse: yes
 
 - name: Create environment file
   template:
     src: ".env.j2"
-    dest: "{{ deploy_path }}/.env"
+    dest: "{{ DEPLOY_PATH }}/.env"
     mode: '0640'
 
 - name: Generate portainer password (raw)
   community.general.htpasswd:
-    path: "{{ deploy_path }}/management/portainer_password_file.raw"
+    path: "{{ DEPLOY_PATH }}/management/portainer_password_file.raw"
     hash_scheme: "bcrypt"
     name: admin
-    password: "{{ portainer_password }}"
+    password: "{{ PORTAINER_PASSWORD }}"
     mode: '0640'
 
 - name: Slurp bcrypt password
   ansible.builtin.slurp:
-    src: "{{ deploy_path }}/management/portainer_password_file.raw"
+    src: "{{ DEPLOY_PATH }}/management/portainer_password_file.raw"
   register: passwordfile
 
 - name: Set fact with escaped bcrypt password
   set_fact:
-    portainer_password_bcrypt_escaped: >-
+    PORTAINER_PASSWORD_BCRYPT: >-
       {{ (passwordfile.content | b64decode).split(':', 1)[1] | replace('$', '$$') | trim }}
   
 - name: Generate Traefik password
   community.general.htpasswd:
-    path: "{{ deploy_path }}/management/usersfile"
+    path: "{{ DEPLOY_PATH }}/management/usersfile"
     name: admin
-    password: "{{ traefik_password }}"
+    password: "{{ TRAEFIK_ENTRYPOINT }}"
     mode: '0640'
 
 
 - name: Generate docker-compose
   template:
     src: "docker-compose.yml.j2"
-    dest: "{{ deploy_path }}/docker-compose.yml"
+    dest: "{{ DEPLOY_PATH }}/docker-compose.yml"
     mode: '0644'
 
 - name: Uruchom stack docker-compose
   community.docker.docker_compose:
-    project_src: "{{ deploy_path }}/management"
+    project_src: "{{ DEPLOY_PATH }}/management"
     state: present
