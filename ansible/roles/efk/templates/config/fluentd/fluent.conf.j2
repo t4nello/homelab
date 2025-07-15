@@ -26,7 +26,7 @@
   @type elasticsearch
   host elasticsearch
   user elastic
-  password ${ES_PASSWORD}
+  password "#{ENV['ELASTICSEARCH_PASSWORD']}"
   api_version 8
   port 9200
   scheme http

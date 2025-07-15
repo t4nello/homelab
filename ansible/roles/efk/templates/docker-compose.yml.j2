@@ -4,7 +4,7 @@ services:
     container_name: fluentd
     user: root
     environment:
-      - ES_PASSWORD=${ES_PASSWORD}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -38,7 +38,7 @@ services:
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
     volumes:
       -  {{DEPLOY_PATH}}/efk-stack/config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:

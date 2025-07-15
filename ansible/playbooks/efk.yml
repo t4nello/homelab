@@ -7,14 +7,9 @@
 
   vars_files:
     - ../inventories/homelab/group_vars/efk.yml
-    - ../secrets/efk.yml
     - ../inventories/homelab/group_vars/common.yml
-
-  vars:
-    portainer_username: "admin"
-    portainer_password: "admin123admin"
-    portainer_host: "127.0.0.1"
-    endpoint_id: 1
+    - ../secrets/efk.yml
+    - ../secrets/common.yml
 
   roles:
     - efk
