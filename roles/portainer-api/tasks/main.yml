@@ -1,6 +1,6 @@
 - name: Login to Portainer
   uri:
-    url: "http://{{ PORTAINER_HOST }}:9000/api/auth"
+    url: "http://{{ HOST }}:9000/api/auth"
     method: POST
     body_format: json
     body:

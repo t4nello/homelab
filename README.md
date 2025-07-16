@@ -1,258 +1,189 @@
 
-# HomeLab
+# HomeLab Deployment with Ansible
 
-Set of docker-compose files for my home environment.
+This repository manages a modular HomeLab infrastructure using Ansible, Docker, and Portainer. It supports deploying multiple services such as monitoring, logging, file sharing, and remote access.
 
-## Stacks and Applications
+----------
 
-* **EFK**
+##  Directory Structure
 
-  * Elasticsearch
-  * FluentD
-  * Kibana
-* **Management**
+```
+.
+├── ansible.cfg
+├── inventories
+│   └── homelab
+│       ├── group_vars
+│       │   ├── common.yml
+│       │   ├── ....
+│		├── secrets
+│       │   ├── management.yml
+│       │   ├── ....
+│       └── hosts
+├── playbooks
+│   ├── efk.yml
+│   ├── ...
+├── roles
+│   ├── efk
+│   ├── ...
+├── secrets
+│   ├── common.yml
+│   ├── ---
+```
 
-  * cloudflared (tunnel)
-  * cloudflared (proxy-DNS for DoH)
-  * Traefik
-  * Portainer
-* **Monitoring**
+----------
 
-  * Node Exporter
-  * Prometheus
-  * Grafana
-  * cAdvisor
-* **Filebrowser**
+## Stack Overview
 
-  * Filebrowser
-* **Guacamole**
+### 1. `efk` — Elasticsearch, Fluentd, Kibana
 
-  * Guacamole
-  * Guacd
-  * MySQL
-* **Pi-hole**
+-   Collects and visualizes logs.
+    
+-   Requires Portainer Endpoint ID and deploy path.
+    
 
-  * Pi-hole
-* **Torrent**
+### 2. `monitoring` — Grafana, Prometheus, Node Exporters
 
-  * qBittorrent
+-   Monitors CPU, memory, disk, and container status.
+    
+-   Uses `GF_USER` variable (Grafana user).
+    
 
-## Environment Variables
+### 3. `filebrowser` — File management UI
 
-### EFK
+-   PUID, GUID, browsing and config paths defined.
+    
 
-| Name                | Required? | Allowed Values         | Default Value | Description                                        |
-| ------------------- | --------- | ---------------------- | ------------- | -------------------------------------------------- |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services                         |
-| HOST                | YES       | a valid domain address |               | Domain address                                     |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS                              |
-| ES\_PASSWORD        | YES       | string                 |               | Elasticsearch password (see additional info below) |
-| KIBANA\_PASSWORD    | YES       | string                 |               | Kibana password (see additional info below)        |
+### 4. `guacamole` — Remote Desktop Gateway
 
-### Management
+-   Exposes RDP/VNC via web UI.
+    
+-   Uses MySQL internally.
+    
 
-| Name                    | Required?                          | Allowed Values                   | Default Value | Description                                                 |
-| ----------------------- | ---------------------------------- | -------------------------------- | ------------- | ----------------------------------------------------------- |
-| TUNNEL\_TOKEN           | YES                                | String                           |               | Token provided by Cloudflare Zero Trust Zone                |
-| TRAEFIK\_ENTRYPOINT     | NO                                 | web/websecure                    | websecure     | Entrypoint of the services                                  | 
-| HOST                    | YES                                | A valid domain address           |               | Domain address                                              |
-| TRAEFIK\_TLS            | NO                                 | true/false                       | true          | Enable or disable TLS                                       |
-| PORTAINER\_EDITION      | NO                                 | ce/ee                            | ce            | Determines the community or enterprise version of Portainer |
-| PORTAINER\_PASSWORD     | YES                                | String                           |               | Password for portainer WebGui password                      |
-| PORTAINER\_LICENCE\_KEY | if PORTAINER\_EDITION is set to ee | String                           |               | Portainer EE licence key                                    |
+### 5. `pihole` — Network-wide DNS sinkhole
 
-### Monitoring
+-   Timezone and optional DNS variables.
+    
 
-| Name                | Required? | Allowed Values         | Default Value | Description                |
-| ------------------- | --------- | ---------------------- | ------------- | -------------------------- |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services |
-| HOST                | YES       | a valid domain address |               | Domain address             |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS      |
+### 6. `torrent` — qBittorrent stack
 
-### Filebrowser
+-   Provides download interface.
+    
+-   Customizable config/download paths.
+    
 
-| Name                | Required? | Allowed Values             | Default Value | Description                                                          |
-| ------------------- | --------- | -------------------------- | ------------- | -------------------------------------------------------------------- |
-| PUID                | NO        | valid user ID              | 1000          | User ID                                                              |
-| GUID                | NO        | valid group ID             | 1000          | Group ID                                                             |
-| BROWSING\_PATH      | YES       | absolute path to directory |               | Path to directory                                                    |
-| CONFIG\_PATH        | YES       | absolute path to config    |               | Path to config directory with config.json and empty database.db file |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure              | websecure     | Entrypoint of the services                                           |
-| HOST                | YES       | a valid domain address     |               | Domain address                                                       |
-| TRAEFIK\_TLS        | NO        | true/false                 | true          | Enable or disable TLS                                                |
+### 7. `management` — Portainer and other admin tools
 
-### Guacamole
+-   Handles base configuration and stack bootstrapping.
+    
 
-| Name                  | Required? | Allowed Values         | Default Value | Description                |
-| --------------------- | --------- | ---------------------- | ------------- | -------------------------- |
-| GUACD\_PORT           | NO        | 0-65535                | 4822          | Guacd port                 |
-| MYSQL\_PORT           | NO        | 0-65535                | 3306          | MySQL database port        |
-| MYSQL\_USER           | NO        | string                 | admin         | MySQL username             |
-| MYSQL\_PASSWORD       | YES       | string                 |               | MySQL password for user    |
-| MYSQL\_ROOT\_PASSWORD | YES       | string                 |               | MySQL password for root    |
-| TRAEFIK\_ENTRYPOINT   | NO        | web/websecure          | websecure     | Entrypoint of the services |
-| HOST                  | YES       | a valid domain address |               | Domain address             |
-| TRAEFIK\_TLS          | NO        | true/false             | true          | Enable or disable TLS      |
+----------
 
-### Pi-hole
+## Variable Files
 
-| Name                | Required? | Allowed Values         | Default Value | Description                        |
-| ------------------- | --------- | ---------------------- | ------------- | ---------------------------------- |
-| TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole               |
-| PIHOLEWEBPASSWORD   | YES       | string                 |               | Password for Pi-hole web interface |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services         |
-| HOST                | YES       | a valid domain address |               | Domain address                     |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS              |
-
-### qBittorrent
-
-| Name                | Required? | Allowed Values         | Default Value | Description                                |
-| ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------ |
-| CONFIG\_PATH        | YES       | absolute path          |               | Path to config directory                   |
-| DOWNLOAD\_PATH      | YES       | absolute path          |               | Path where downloaded files will be stored |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services                 |
-| HOST                | YES       | a valid domain address |               | Domain address                             |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS                      |
+### common.yml
+| Name                  | Required? | Allowed Values           | Default Value | Description                                              |
+|-----------------------|-----------|--------------------------|---------------|----------------------------------------------------------|
+| HOST                  | YES       | valid domain or IP       |               | Domain or IP address of the host                         |
+| TRAEFIK_ENTRYPOINT    | NO        | web / websecure          | websecure     | Entrypoint for the services                              |
+| TRAEFIK_TLS           | NO        | true / false             | true          | Enable or disable TLS                                    |
+| DEPLOY_PATH           | YES       | absolute filesystem path |               | Path where generated files from templates will be stored |
+| PORTAINER_ENDPOINT_ID | NO        | integer                  | 1             | Portainer environment (endpoint) identifier              |
+---
+### management.yml
+| Name               | Required? | Allowed Values | Default Value | Description                                                 |
+|--------------------|-----------|----------------|---------------|-------------------------------------------------------------|
+| PORTAINER\_EDITION | NO        | ce/ee          | ce            | Determines the community or enterprise version of Portainer | 
+---
 
 ---
 
-## Deployment
+## Secrets
+To generate secres you 
 
-### 1. Clone the repository
+##  Deployment Instructions
 
-```bash
-git clone <repo_url>
-```
+###  Step-by-Step Stack Deployment
 
-### 2. Navigate to the management stack directory
-
-```bash
-cd homelab/stack-management
-```
-
-### 3. Create necessary Docker networks
+Each stack can be deployed individually:
 
 ```bash
-docker network create --opt com.docker.network.bridge.name=management management
-docker network create --opt com.docker.network.bridge.name=monitoring monitoring
-docker network create --opt com.docker.network.bridge.name=torrent torrent
-docker network create --opt com.docker.network.bridge.name=guacd guacd
+ansible-playbook -i inventories/homelab playbooks/management.yml
+ansible-playbook -i inventories/homelab playbooks/efk.yml
+ansible-playbook -i inventories/homelab playbooks/monitoring.yml
+ansible-playbook -i inventories/homelab playbooks/filebrowser.yml
+ansible-playbook -i inventories/homelab playbooks/guacamole.yml
+ansible-playbook -i inventories/homelab playbooks/pihole.yml
+ansible-playbook -i inventories/homelab playbooks/torrent.yml
+
 ```
 
-### 4. Create a `.env` file
-
-Create a `.env` file in the `stack-management` directory and define the required environment variables.
-Example:
-
-```env
-HOST=example.com
-TRAEFIK_TLS=true
-TRAEFIK_ENTRYPOINT=websecure
-```
-
-### 5. Install apache2-utils to generate password file for Traefik/Prometheus
+### Full Deployment Order (All Stacks)
 
 ```bash
-sudo apt install apache2-utils
-htpasswd -Bc -C 6 <path/to/management/compose>/usersfile <username>
+# 1. Portainer and management tools
+ansible-playbook -i inventories/homelab playbooks/management.yml
+
+# 2. Logging and core services
+ansible-playbook -i inventories/homelab playbooks/efk.yml
+
+# 3. Monitoring stack
+ansible-playbook -i inventories/homelab playbooks/monitoring.yml
+
+# 4. Remaining application stacks
+ansible-playbook -i inventories/homelab playbooks/filebrowser.yml
+ansible-playbook -i inventories/homelab playbooks/guacamole.yml
+ansible-playbook -i inventories/homelab playbooks/pihole.yml
+ansible-playbook -i inventories/homelab playbooks/torrent.yml
+
 ```
 
-### 6. Deploy the management stack
+You can also combine them in a shell script or makefile for automation.
 
-```bash
-docker-compose -f docker-compose-management.yml -p management up -d
+----------
+
+##  Notes
+
+-   The `.env` files are templated using Ansible variables and injected dynamically before deploying to Portainer.
+    
+-   Each `docker-compose.yml` is rendered from a Jinja2 template stored in the role's `templates/` folder.
+    
+-   `portainer-auth` role handles dynamic token retrieval for secure stack deployments.
+    
+-   Elasticsearch and Kibana passwords are automatically reset and extracted after container boot.
+    
+
+----------
+
+## Secrets Management
+
+Secrets are stored in `secrets/*.yml` and imported in Ansible tasks with `lookup('file', ...)` or `vars_files`. Ensure these files are excluded in `.gitignore`.
+
+----------
+
+## Example Environment Variables
+
+Example from `group_vars/efk.yml`:
+
+```yaml
+ENDPOINT_ID: 1
+
 ```
 
-### 7. Log in to Portainer
+Example from `group_vars/filebrowser.yml`:
 
-Open in browser:
+```yaml
+PUID: 1000
+GUID: 1000
+BROWSING_PATH: /srv/files
+CONFIG_PATH: /srv/filebrowser/config
 
 ```
-https://portainer.<your-domain>
-```
 
-### 8. Deploy additional stacks
+For full variable reference, see [VARIABLES.md](https://chatgpt.com/c/VARIABLES.md) (optional split file).
 
-Use Portainer to deploy other stacks. Refer to the **"Additional Info for stacks"** section for details.
+----------
 
-## Additional Info for Stacks
+##  Support
 
-### Filebrowser
-
-Create a directory containing `config.json` and an empty `database.db` file. Example `config.json`:
-
-```json
-{
-  "port": 80,
-  "baseURL": "",
-  "address": "",
-  "log": "stdout",
-  "database": "/database.db",
-  "root": "/srv"
-}
-```
-
-Set `CONFIG_PATH` to the absolute path of this directory.
-
-### Guacamole
-
-You need to build a MySQL image with init scripts to create the proper database schema and an initial user `guacadmin` / `guacadmin`.
-
-Scripts and Dockerfile are located in the `stack-guacamole` directory.
-You can build the image via Portainer or CLI:
-
-```bash
-docker build -t mysql/guacamole -f mysql.Dockerfile .
-```
-
-#### Wake-on-LAN (WoL) Setup for Guacamole (version 1.5.5)
-
-**Important:** Guacamole version **1.5.5** is recommended. Version **1.6.0** has known issues with WoL.
-
-Since a bridge network is used, WoL packets must be routed to your home LAN.
-
-##### Steps:
-
-1. Move the `wol-relay.sh` script to `/usr/bin/` and make it executable:
-
-```bash
-sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.sh /usr/bin/wol-relay.sh
-sudo chmod +x /usr/bin/wol-relay.sh
-```
-
-2. Move the `wol-relay.service` file to the systemd directory:
-
-```bash
-sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.service /etc/systemd/system/
-```
-
-3. Enable and start the service:
-
-```bash
-sudo systemctl enable wol-relay.service
-sudo systemctl start wol-relay.service
-```
-
-4. Check service status:
-
-```bash
-sudo systemctl status wol-relay.service
-```
-
-### EFK
-
-To generate passwords for Kibana and FluentD:
-
-1. Connect to the Elasticsearch container:
-
-```bash
-docker exec -it <elastic_container_id> /bin/sh
-```
-
-2. Run:
-
-```bash
-bash bin/elasticsearch-setup-passwords auto
-```
-
-3. Use the generated passwords in your environment variables.
+This structure is maintained manually. For questions, raise an issue or contact the repository maintainer.
