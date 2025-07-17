@@ -1,10 +1,11 @@
+---
 - name: Login to Portainer
   uri:
-    url: "http://{{ PORTAINER_HOST }}:9000/api/auth"
+    url: "http://{{ HOST }}:9000/api/auth"
     method: POST
     body_format: json
     body:
-      Username: "{{ PORTAINER_USERNAME }}"
+      Username: "admin"
       Password: "{{ PORTAINER_PASSWORD }}"
     status_code: 200
   register: login_response
