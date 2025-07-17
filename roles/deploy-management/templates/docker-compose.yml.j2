@@ -78,13 +78,11 @@ services:
     image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
     container_name: portainer
     command:
-      - "--log-level=DEBUG"
       - "--host=unix:///var/run/docker.sock"
-      - "--admin-password={{ PORTAINER_PASSWORD_BCRYPT }}"
-{% if PORTAINER_EDITION == 'ee' %}
-      - "--license-key={{ PORTAINER_LICENCE_KEY }}"
-{% endif %}
-
+      - "--admin-password={{portainer_password_bcrypt_escaped}}"
+    {% if portainer_edition == 'ee' %}
+      - "--license-key={{ portainer_licence_key }}"
+    {% endif %}
     ports:
       - "9000:9000"
     volumes:

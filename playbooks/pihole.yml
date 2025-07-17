@@ -1,8 +1,0 @@
-- name: Deploy Pihole Stack
-  hosts: localhost
-  connection: local
-  vars_files:
-    - ../inventories/homelab/group_vars/pihole.yml
-    - ../secrets/pihole.yml
-  roles:
-    - pihole

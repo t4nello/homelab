@@ -1,0 +1,58 @@
+---
+- name: Install dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+
+
+- name: Add Docker GPG key
+  become: true
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+    force: true
+
+- name: Add Docker APT repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Install Docker Engine
+  become: true
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Create custom Docker networks
+  community.docker.docker_network:
+    name: "{{ item.name }}"
+    driver: bridge
+    driver_options:
+      com.docker.network.bridge.name: "{{ item.bridge }}"
+    state: present
+  loop:
+    - { name: "management", bridge: "management" }
+    - { name: "monitoring", bridge: "monitoring" }
+    - { name: "torrent", bridge: "torrent" }
+    - { name: "guacd", bridge: "guacd" }
+    - { name: "logging", bridge: "logging" }
+
+- name: Create docker deploy path
+  ansible.builtin.file:
+    path: "{{ DEPLOY_PATH }}"
+    state: directory
+    recurse: yes

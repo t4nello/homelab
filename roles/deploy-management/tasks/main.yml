@@ -1,18 +1,3 @@
-- name: Create custom Docker networks
-  community.docker.docker_network:
-    name: "{{ item.name }}"
-    driver: bridge
-    driver_options:
-      com.docker.network.bridge.name: "{{ item.bridge }}"
-    state: present
-  loop:
-    - { name: "management", bridge: "management" }
-    - { name: "monitoring", bridge: "monitoring" }
-    - { name: "torrent", bridge: "torrent" }
-    - { name: "guacd", bridge: "guacd" }
-    - { name: "logging", bridge: "logging" }
-
-
 - name: Create docker deploy path
   file:
     path: "{{ DEPLOY_PATH }}/stack-management/"

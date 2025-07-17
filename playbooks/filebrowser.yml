@@ -1,8 +1,0 @@
-- name: Deploy Filebrowser Stack
-  hosts: localhost
-  connection: local
-  vars_files:
-    - ../inventories/homelab/group_vars/filebrowser.yml
-    - ../secrets/filebrowser.yml
-  roles:
-    - filebrowser

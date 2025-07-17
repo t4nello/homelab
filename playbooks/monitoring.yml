@@ -1,8 +1,0 @@
-- name: Deploy Monitoring Stack
-  hosts: localhost
-  connection: local
-  vars_files:
-    - ../inventories/homelab/group_vars/monitoring.yml
-    - ../secrets/monitoring.yml
-  roles:
-    - monitoring
