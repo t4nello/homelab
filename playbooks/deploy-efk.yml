@@ -1,0 +1,13 @@
+- name: Deploy EFK Stack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - ../group_vars/vars/all.yml
+    - ../group_vars/vars/management.yml
+    - ../group_vars/vault/management.yml
+
+  roles:
+    - portainer-api-login
+    - deploy-efk

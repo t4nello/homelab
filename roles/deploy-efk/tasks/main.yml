@@ -1,0 +1,121 @@
+- name: Create dir for deployment
+  file:
+    path: "{{ DEPLOY_PATH }}/efk-stack/"
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Create config subdirectories
+  file:
+    path: "{{ DEPLOY_PATH }}/efk-stack/config/{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - es
+    - fluentd
+    - kibana
+
+- name: Template config files (Elasticsearch, Fluentd, Kibana)
+  template:
+    src: "config/{{ item.src }}"
+    dest: "{{ DEPLOY_PATH }}/efk-stack/config/{{ item.dest }}"
+    mode: "0644"
+  loop:
+    - { src: "es/elasticsearch.yml.j2", dest: "es/elasticsearch.yml" }
+    - { src: "fluentd/fluent.conf.j2", dest: "fluentd/fluent.conf" }
+    - { src: "kibana/kibana.yml.j2", dest: "kibana/kibana.yml" }
+
+- name: Template docker-compose.yml
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ DEPLOY_PATH }}/efk-stack/docker-compose.yml"
+    mode: "0644"
+
+- name: Deploy initial EFK stack
+  uri:
+    url: "http://{{ HOST }}:9000/api/stacks/create/standalone/string?endpointId={{ ENDPOINT_ID }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      Name: "efk"
+      StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/efk-stack/docker-compose.yml') }}"
+      ComposeFormat: "3"
+      EndpointID: "{{ ENDPOINT_ID }}"
+      Env:
+        - name: HOST
+          value: "{{HOST }}"
+        - name: TRAEFIK_ENTRYPOINT
+          value: "{{ TRAEFIK_ENTRYPOINT }}"
+    status_code: [200, 409]
+  register: stack_create_result
+
+
+- name: Wait for Elasticsearch container to run
+  shell: docker ps --filter "name=elasticsearch" --filter "status=running" --format "{{ '{{' }}.Names{{ '}}' }}"
+  register: es_container_check
+  retries: 30
+  delay: 5
+  until: es_container_check.stdout_lines | length > 0
+  changed_when: false
+
+- name: Get elastic passwords
+  shell: echo y | docker exec -i elasticsearch bin/elasticsearch-setup-passwords auto
+  register: es_password_output
+  retries: 3
+  delay: 10
+  until: es_password_output.rc == 0 and "'ERROR' not in es_password_output.stderr"
+  changed_when: "'Changed password for user' in es_password_output.stdout"
+  failed_when: "'ERROR' in es_password_output.stderr or es_password_output.rc != 0"
+
+- name: Extract elastic password
+  set_fact:
+    ELASTICSEARCH_PASSWORD:  "{{ (es_password_output.stdout | regex_search('PASSWORD elastic = (\\S+)', '\\1')) | first }}"
+    KIBANA_PASSWORD: "{{ es_password_output.stdout | regex_search('PASSWORD kibana = (\\S+)', '\\1') | first }}"
+
+- name: Get stacks list
+  uri:
+    url: "http://{{ HOST }}:9000/api/stacks?endpointId={{ ENDPOINT_ID }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+    return_content: yes
+  register: stacks_list
+
+- name: Find EFK stack's ID
+  set_fact:
+    stack_id: "{{ (stacks_list.json | selectattr('Name', 'equalto', 'efk') | list)[0].Id }}"
+  when: stacks_list.json | length > 0
+
+- name: Is stack found?
+  fail:
+    msg: "Efk stack not found!"
+  when: stack_id is not defined
+
+
+- name: Update stack for extraced passwords
+  uri:
+    url: "http://{{ HOST }}:9000/api/stacks/{{stack_id}}?endpointId={{ ENDPOINT_ID }}"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      Name: "efk"
+      StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/efk-stack/docker-compose.yml') }}"
+      ComposeFormat: "3"
+      EndpointID: "{{ ENDPOINT_ID }}"
+      Env:
+        - name: HOST
+          value: "{{ HOST }}"
+        - name: TRAEFIK_ENTRYPOINT
+          value: "{{ TRAEFIK_ENTRYPOINT }}"
+        - name: KIBANA_PASSWORD
+          value: "{{KIBANA_PASSWORD | string}}"
+        - name: ELASTICSEARCH_PASSWORD
+          value: "{{ ELASTICSEARCH_PASSWORD | string }}"
+    status_code: [200, 409]
+  register: stack_create_result
