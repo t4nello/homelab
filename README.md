@@ -2,6 +2,7 @@
 # HomeLab
 
 Set of docker-compose files for my home environment.
+See `ansible` branch for deployment with ansible
 
 ## Stacks and Applications
 
