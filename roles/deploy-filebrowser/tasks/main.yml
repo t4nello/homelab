@@ -1,0 +1,51 @@
+- name: Create directory for deployment
+  file:
+    path: "{{ DEPLOY_PATH }}filebrowser-stack/config"
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Copy config.json to filebrowser config directory
+  ansible.builtin.copy:
+    src: config.json
+    dest: "{{ DEPLOY_PATH }}/filebrowser-stack/config/config.json"
+    owner: "{{ PUID | default(1000) }}"
+    group: "{{ PGID | default(1000) }}"
+    mode: '0644'
+  
+- name: Create empty database.db file
+  file:
+    path: "{{ deploy_path }}/filebrowser-stack/config/database.db"
+    state: touch
+    mode: '0644'
+    owner: "{{ puid | default(1000) }}"
+    group: "{{ pgid | default(1000) }}"
+
+
+- name: Template docker-compose.yml
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ DEPLOY_PATH }}/filebrowser-stack/docker-compose.yml"
+    mode: "0644"
+
+- name: Deploy Filebrowser stack
+  uri:
+    url: "http://{{ HOST }}:9000/api/stacks/create/standalone/string?endpointId={{ ENDPOINT_ID }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      Name: "filebrowser"
+      StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/filebrowser-stack/docker-compose.yml') }}"
+      ComposeFormat: "3"
+      EndpointID: "{{ ENDPOINT_ID }}"
+      Env:
+        - name: PUID
+          value: "{{ PUID }}"
+        - name: PGID
+          value: "{{ PGID }}"
+    status_code: [200, 409]
+    timeout: 300
+  register: stack_create_result

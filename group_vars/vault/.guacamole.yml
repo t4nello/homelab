@@ -1,0 +1,2 @@
+GUACAMOLE_DB_PASSWORD: guacpass
+MYSQL_ROOT_PASSWORD: myrootpass

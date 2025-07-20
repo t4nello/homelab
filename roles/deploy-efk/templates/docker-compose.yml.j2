@@ -45,9 +45,9 @@ services:
       - elasticsearch
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kibana.rule=Host(`kibana.${HOST}`)"
-      - "traefik.http.routers.kibana.entryPoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.kibana.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.kibana.rule=Host(`kibana.{{HOST}}`)"
+      - "traefik.http.routers.kibana.entryPoints={{TRAEFIK_ENTRYPOINT | default ('websecure')}}"
+      - "traefik.http.routers.kibana.tls={{TRAEFIK_TLS | default ('true')}}"
       - "traefik.http.routers.kibana.priority=15"
       - "traefik.http.services.kibana.loadbalancer.server.port=5601"
       - "traefik.docker.network=management"

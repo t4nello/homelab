@@ -16,14 +16,24 @@
     - kibana
 
 - name: Template config files (Elasticsearch, Fluentd, Kibana)
-  template:
-    src: "config/{{ item.src }}"
-    dest: "{{ DEPLOY_PATH }}/efk-stack/config/{{ item.dest }}"
+  file:
+    src: "config/{{ item }}"
+    dest: "{{ DEPLOY_PATH }}/efk-stack/config/{{ item }}"
     mode: "0644"
   loop:
-    - { src: "es/elasticsearch.yml.j2", dest: "es/elasticsearch.yml" }
-    - { src: "fluentd/fluent.conf.j2", dest: "fluentd/fluent.conf" }
-    - { src: "kibana/kibana.yml.j2", dest: "kibana/kibana.yml" }
+    - es/elasticsearch.yml
+    - fluentd/fluent.conf
+    - kibana/kibana.yml
+
+- name: Build custom Fluentd image with plugins
+  docker_image:
+    build:
+      dockerfile: fluentd.Dockerfile
+    name: fluentd-plugins
+    tag: latest
+    force_source: true
+    force_tag: true
+
 
 - name: Template docker-compose.yml
   template:
@@ -44,11 +54,6 @@
       StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/efk-stack/docker-compose.yml') }}"
       ComposeFormat: "3"
       EndpointID: "{{ ENDPOINT_ID }}"
-      Env:
-        - name: HOST
-          value: "{{HOST }}"
-        - name: TRAEFIK_ENTRYPOINT
-          value: "{{ TRAEFIK_ENTRYPOINT }}"
     status_code: [200, 409]
   register: stack_create_result
 
@@ -109,10 +114,6 @@
       ComposeFormat: "3"
       EndpointID: "{{ ENDPOINT_ID }}"
       Env:
-        - name: HOST
-          value: "{{ HOST }}"
-        - name: TRAEFIK_ENTRYPOINT
-          value: "{{ TRAEFIK_ENTRYPOINT }}"
         - name: KIBANA_PASSWORD
           value: "{{KIBANA_PASSWORD | string}}"
         - name: ELASTICSEARCH_PASSWORD

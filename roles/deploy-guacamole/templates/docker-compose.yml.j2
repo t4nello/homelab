@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  guacd:
+    image: guacamole/guacd
+    container_name: guacd
+    restart: on-failure:5
+    networks:
+      - guacd
+    volumes:
+      - guacd-record:/record:rw
+
+  guacamole:
+    image: guacamole/guacamole
+    container_name: guacamole
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guacamole.rule=Host(`guacamole.{{HOST}}`)"
+      - "traefik.http.routers.guacamole.entryPoints={{TRAEFIK_ENTRYPOINT | default ('websecure')}}"
+      - "traefik.http.routers.guacamole.tls={{TRAEFIK_TLS | default ('true')}}"
+      - "traefik.http.routers.guacamole.priority=15"
+      - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
+      - "traefik.docker.network=management"
+    environment:
+      - GUACD_HOSTNAME=guacd
+      - MYSQL_HOSTNAME=mysql
+      - MYSQL_DATABASE={{ GUACAMOLE_DB_NAME | default ('guacamole') }}
+      - MYSQL_USER={{ GUACAMOLE_DB_USER  | default ('guacamole') }}
+      - MYSQL_PASSWORD={{ guacamole_db_password }}
+    restart: on-failure:5
+    networks:
+      - guacd
+      - management
+
+  mysql:
+    image: mysql/guacamole:latest
+    container_name: mysql
+    environment:
+      - MYSQL_DATABASE={{ GUACAMOLE_DB_NAME | default ('guacamole') }}
+      - MYSQL_USER={{ GUACAMOLE_DB_USER | default ('guacamole') }}
+      - MYSQL_PASSWORD={{ guacamole_db_password }}
+      - MYSQL_ROOT_PASSWORD={{ mysql_root_password }}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: on-failure:5
+    networks:
+      - guacd
+
+networks:
+  management:
+    external: true
+  guacd:
+    driver: bridge
+
+volumes:
+  guacd-record: {}
+  mysql-data: {}

@@ -1,12 +1,13 @@
-- name: Deploy EFK Stack
+- name: Deploy filebrowser Stack
   hosts: localhost
   connection: local
   gather_facts: false
 
   vars_files:
     - ../group_vars/vars/all.yml
+    - ../group_vars/vars/filebrowser.yml
     - ../group_vars/vault/management.yml
 
   roles:
     - portainer-api-login
-    - deploy-monitoring
+    - deploy-filebrowser
