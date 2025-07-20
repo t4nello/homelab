@@ -26,7 +26,7 @@ services:
       - MYSQL_HOSTNAME=mysql
       - MYSQL_DATABASE={{ GUACAMOLE_DB_NAME | default ('guacamole') }}
       - MYSQL_USER={{ GUACAMOLE_DB_USER  | default ('guacamole') }}
-      - MYSQL_PASSWORD={{ guacamole_db_password }}
+      - MYSQL_PASSWORD={{ GUACAMOLE_DB_PASSWORD }}
     restart: on-failure:5
     networks:
       - guacd
@@ -38,8 +38,8 @@ services:
     environment:
       - MYSQL_DATABASE={{ GUACAMOLE_DB_NAME | default ('guacamole') }}
       - MYSQL_USER={{ GUACAMOLE_DB_USER | default ('guacamole') }}
-      - MYSQL_PASSWORD={{ guacamole_db_password }}
-      - MYSQL_ROOT_PASSWORD={{ mysql_root_password }}
+      - MYSQL_PASSWORD={{ GUACAMOLE_DB_PASSWORD }}
+      - MYSQL_ROOT_PASSWORD={{ MYSQL_ROOT_PASSWORD }}
     volumes:
       - mysql-data:/var/lib/mysql
     restart: on-failure:5

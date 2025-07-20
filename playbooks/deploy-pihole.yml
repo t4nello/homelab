@@ -1,0 +1,14 @@
+- name: Deploy EFK Stack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - ../group_vars/vars/all.yml
+    - ../group_vars/vault/management.yml
+    - ../group_vars/vars/pihole.yml
+   -  ../group_vars/vault/pihole.yml
+
+  roles:
+    - portainer-api-login
+    - deploy-monitoring

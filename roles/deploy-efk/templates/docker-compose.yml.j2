@@ -18,8 +18,6 @@ services:
   elasticsearch:
     image: elasticsearch:9.0.2
     container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
     volumes:
       -  {{DEPLOY_PATH}}/efk-stack/config/es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - elasticsearch_data:/usr/share/elasticsearch/data

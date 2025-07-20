@@ -64,7 +64,20 @@
       Name: "guacamole"
       StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/guacamole-stack/docker-compose.yml') }}"
       ComposeFormat: "3"
-      EndpointID: "{{ ENDPOINT_ID }}"
+      EndpointID: {{ ENDPOINT_ID | default(1) }}
+      Env:
+      - name: GUACD_HOSTNAME
+        value: "guacd"
+      - name: MYSQL_HOSTNAME
+        value: "mysql"
+      - name: MYSQL_DATABASE
+        value: "{{GUACAMOLE_DB_NAME}}"
+      - name: MYSQL_USER
+        value: "{{GUACAMOLE_DB_USER}}"
+      - name: MYSQL_PASSWORD
+        value: "{{GUACAMOLE_DB_PASSWORD}}"
+      - name: MYSQL_ROOT_PASSWORD
+        value: "{{MYSQL_ROOT_PASSWORD}}"
     status_code: [200, 409]
     timeout: 300
   register: stack_create_result

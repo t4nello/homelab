@@ -27,7 +27,7 @@ services:
     container_name: prometheus
     volumes:
       - prometheus_data:/prometheus
-      -  {{DEPLOY_PATH}}/monitoring-stack/config/prometheus:/etc/prometheus/
+      - {{DEPLOY_PATH}}/monitoring-stack/config/prometheus:/etc/prometheus/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.{{HOST}}`)"

@@ -1,0 +1,36 @@
+- name: Create dir for deployment
+  file:
+    path: "{{ DEPLOY_PATH }}/torrent-stack/"
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: Template docker-compose.yml
+  template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ DEPLOY_PATH }}/torrent-stack/docker-compose.yml"
+    mode: "0644"
+
+- name: Deploy Torrent stack
+  uri:
+    url: "http://{{ HOST }}:9000/api/stacks/create/standalone/string?endpointId={{ ENDPOINT_ID }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      Name: "torrent"
+      StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/torrent-stack/docker-compose.yml') }}"
+      ComposeFormat: "3"
+      EndpointID: {{ ENDPOINT_ID | default(1) }}
+      Env:
+      - name: DOWNLOADS_PATH
+        value: "{{DOWNLOADS_PATH}}"
+      - name: PUID
+        value: "{{PUID}} "
+      - name: PGID
+        value: "{{PGID}}"
+    status_code: [200, 409]
+    timeout: 300
+  register: stack_create_result

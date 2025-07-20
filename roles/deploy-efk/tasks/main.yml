@@ -53,7 +53,7 @@
       Name: "efk"
       StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/efk-stack/docker-compose.yml') }}"
       ComposeFormat: "3"
-      EndpointID: "{{ ENDPOINT_ID }}"
+      EndpointID: {{ ENDPOINT_ID | default(1) }}
     status_code: [200, 409]
   register: stack_create_result
 
@@ -112,11 +112,13 @@
       Name: "efk"
       StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/efk-stack/docker-compose.yml') }}"
       ComposeFormat: "3"
-      EndpointID: "{{ ENDPOINT_ID }}"
+      EndpointID: {{ ENDPOINT_ID | default(1) }}
       Env:
         - name: KIBANA_PASSWORD
           value: "{{KIBANA_PASSWORD | string}}"
         - name: ELASTICSEARCH_PASSWORD
           value: "{{ ELASTICSEARCH_PASSWORD | string }}"
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch:9200" 
     status_code: [200, 409]
   register: stack_create_result

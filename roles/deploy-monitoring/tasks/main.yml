@@ -51,7 +51,7 @@
       Name: "monitoring"
       StackFileContent: "{{ lookup('file', DEPLOY_PATH + '/monitoring-stack/docker-compose.yml') }}"
       ComposeFormat: "3"
-      EndpointID: "{{ ENDPOINT_ID }}"
+      EndpointID: {{ ENDPOINT_ID | default(1) }}
     status_code: [200, 409]
     timeout: 300
   register: stack_create_result
