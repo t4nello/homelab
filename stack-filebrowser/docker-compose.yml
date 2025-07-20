@@ -12,11 +12,11 @@ services:
       - ${CONFIG_PATH}/config.json:/config.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`fb.${HOST}`)"
-      - "traefik.http.routers.grafana.entryPoints=${TRAEFIK_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.grafana.tls=${TRAEFIK_TLS:-true}"
-      - "traefik.http.routers.grafana.priority=15"
-      - "traefik.http.services.grafana.loadbalancer.server.port=80"
+      - "traefik.http.routers.filebrowser.rule=Host(`fb.${HOST}`)"
+      - "traefik.http.routers.filebrowser.entryPoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.filebrowser.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.filebrowser.priority=15"
+      - "traefik.http.services.filebrowser.loadbalancer.server.port=80"
       - "traefik.docker.network=management"
     environment:
       - PUID=${PUID:-1000}
