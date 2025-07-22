@@ -12,11 +12,12 @@ services:
       - "53:53/tcp" 
       - "53:53/udp"
     environment:
-      TZ: "Europe/Warsaw"
-      WEBPASSWORD: ${PIHOLEWEBPASSWORD} 
+      TZ=Europe/Warsaw
+      WEBPASSWORD=${PIHOLEWEBPASSWORD} 
+      FTLCONF_dns_upstreams=cloudflaredns#5053
     volumes:
-      - pihole_etc:/etc/pihole
-      - pihole_dnsmasq:/etc/dnsmasq.d
+      - pihole-etc:/etc/pihole
+      - pihole-dnsmasq:/etc/dnsmasq.d
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.pihole.rule=Host(`pihole.t4nello.site`)"
@@ -30,11 +31,18 @@ services:
       - NET_BIND_SERVICE
       - NET_RAW
       - CAP_NET_ADMIN
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        tag: pihole
 
 networks:
   management:
     external: true
 
 volumes:
-  pihole_etc:
-  pihole_dnsmasq:
+  pihole-etc:
+    name: pihole-etc
+  pihole-dnsmasq:
+    name: pihole-dnsmaql

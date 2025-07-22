@@ -4,14 +4,18 @@ services:
   guacd:
     image: guacamole/guacd
     container_name: guacd
-    environment:
-      - "GUACD_LOG_LEVEL=debug"
     restart: on-failure:5
     networks:
       - guacd
+      - monitoring
     volumes:
-    - guacd-record:/record:rw
-    
+      - guacd-record:/record:rw
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        tag: guacd
+
   guacamole:
     image: guacamole/guacamole
     container_name: guacamole
@@ -24,19 +28,20 @@ services:
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
       - "traefik.docker.network=management"
     environment:
-      - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
+      - GUACD_HOSTNAME=guacd
       - MYSQL_HOSTNAME=mysql
-      - GUACD_PORT=${GUACD_PORT:-4822}
-      - EXTENSION_PRIORITY=mysql
-      - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_AUTO_CREATE_ACCOUNTS=true
     restart: on-failure:5
     networks:
       - guacd
       - management
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        tag: guacamole
 
   mysql:
     image: mysql/guacamole:latest
@@ -58,8 +63,8 @@ networks:
   guacd:
     driver: bridge
 
-  
-
 volumes:
-  guacd-record: {}
-  mysql-data: {}
+  guacd-record: 
+    name: guacd-record
+  mysql-data: 
+    name: mysql-data

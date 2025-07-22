@@ -24,6 +24,11 @@ services:
     restart: unless-stopped
     networks:
       - torrent
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        tag: qbittorrent
 
 networks:
   torrent:

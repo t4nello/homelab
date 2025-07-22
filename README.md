@@ -6,11 +6,10 @@ See `ansible` branch for deployment with ansible
 
 ## Stacks and Applications
 
-* **EFK**
+* **Logging**
 
-  * Elasticsearch
-  * FluentD
-  * Kibana
+  * Loki
+  * FluentBit
 * **Management**
 
   * cloudflared (tunnel)

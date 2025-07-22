@@ -8,7 +8,6 @@ services:
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-      - TUNNEL_LOGLEVEL=debug
       - TUNNEL_METRICS=0.0.0.0:60123
     healthcheck:
       test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
@@ -18,6 +17,12 @@ services:
     networks:
       - management
       - monitoring
+    logging:
+      driver: fluentd
+      options:
+      fluentd-address: fluent-bit:24224
+      tag: cloudflare-tunnel
+
   
   cloudflared:
     image: cloudflare/cloudflared
@@ -32,13 +37,17 @@ services:
     networks:
       - management
       - monitoring
+    logging:
+      driver: fluentd
+      options:
+      fluentd-address: fluent-bit:24224
+      tag: cloudflare-dns
 
   traefik:
     image: traefik:v3.3.4
     container_name: traefik
     command:
       - "--api=true"
-      - "--log.level=debug"
       - "--providers.docker.exposedByDefault=false"
       - "--accesslog=true"
       - "--providers.file.filename=/etc/traefik/definition.yml"
@@ -58,7 +67,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - ./usersfile:/usersfile
       - ./certs:/certs
-      - ./certs/definition.yml:/etc/traefik/definition.yml  
+      - ./definition.yml:/etc/traefik/definition.yml
     labels:
       - "traefik.enable=true" 
       - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
@@ -73,6 +82,11 @@ services:
       - management
       - monitoring
       - torrent
+    logging:
+      driver: fluentd
+      options:
+      fluentd-address: fluent-bit:24224
+      tag: traefik
 
   portainer:
     image: portainer/portainer-ee:latest
@@ -101,4 +115,5 @@ networks:
     external: true
 
 volumes:
-   portainer_data:
+   portainer-data:
+    name: portainer-data

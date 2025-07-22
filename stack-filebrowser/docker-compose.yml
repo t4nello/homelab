@@ -5,7 +5,6 @@ services:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
     restart: unless-stopped
-    user: "${PUID:-1000}:${GUID:-1000}"
     volumes:
       - ${BROWSING_PATH}:/srv
       - ${CONFIG_PATH}/database.db:/database.db
@@ -23,6 +22,12 @@ services:
       - PGID=${GUID:-1000}
     networks:
       - management
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        tag: filebrowser
+        fluentd-async-connect: "true"
 networks:
   management:
     external: true 
