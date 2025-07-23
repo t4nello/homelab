@@ -226,7 +226,6 @@ sudo chmod +x /usr/bin/wol-relay.sh
 ```bash
 sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.service /etc/systemd/system/
 ```
-
 3. Enable and start the service:
 
 ```bash
@@ -239,6 +238,14 @@ sudo systemctl start wol-relay.service
 ```bash
 sudo systemctl status wol-relay.service
 ```
+##### If you want to login to Windows PC via Microsoft account 
+1. Enable Remote Desktop on the Computer that you want to remote.
+2.  On that remote computer, Run the following command in the Run… `windows key` + `r`
+runas /u:MicrosoftAccount\your@email.com cmd.exe
+3. A Command Prompt will be shown, type your current Microsoft Account password and enter.
+Now, you can connect to that computer via Remote Desktop.
+You can find the detail here https://nready.net/remote-desktop-on-windows-11-with-microsoft-account-mfa/
+
 
 ### EFK
 
