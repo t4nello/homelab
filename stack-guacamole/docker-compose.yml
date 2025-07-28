@@ -39,7 +39,7 @@ services:
       - management
 
   mysql:
-    image: mysql/guacamole:latest
+    image: mysql:latest
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -48,6 +48,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql/schema:/docker-entrypoint-initdb.d/
     restart: on-failure:5
     networks:
       - guacd
@@ -61,5 +62,7 @@ networks:
   
 
 volumes:
-  guacd-record: {}
-  mysql-data: {}
+  guacd-record: 
+    name: guacd-record
+  mysql-data: 
+    name: mysql-data
