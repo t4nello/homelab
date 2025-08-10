@@ -2,6 +2,8 @@ services:
   qbittorrent:
     image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent
+    environment:
+      - QBT_LEGAL_NOTICE=confirm
     volumes:
       - ${CONFIG_PATH}:/config
       - ${DOWNLOAD_PATH}:/downloads
