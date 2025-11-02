@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+      - name: cloudflared
+        image: cloudflare/cloudflared:latest
+        command: ["cloudflared", "tunnel", "run"]
+        env:
+        - name: TUNNEL_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-secret
+              key: TUNNEL_TOKEN
+        - name: TUNNEL_LOGLEVEL
+          value: "debug"
+        - name: TUNNEL_METRICS
+          value: "0.0.0.0:60123"
+        ports:
+        - containerPort: 60123
+          name: metrics
+      restartPolicy: Always

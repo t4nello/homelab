@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: cadvisor
+  template:
+    metadata:
+      labels:
+        app: cadvisor
+    spec:
+      containers:
+      - name: cadvisor
+        image: gcr.io/cadvisor/cadvisor:latest
+        volumeMounts:
+        - mountPath: /rootfs
+          name: rootfs
+          readOnly: true
+        - mountPath: /var/run
+          name: varrun
+        - mountPath: /sys
+          name: sys
+          readOnly: true
+        - mountPath: /var/lib/docker
+          name: docker
+          readOnly: true
+      volumes:
+      - name: rootfs
+        hostPath: { path: / }
+      - name: varrun
+        hostPath: { path: /var/run }
+      - name: sys
+        hostPath: { path: /sys }
+      - name: docker
+        hostPath: { path: /var/lib/docker }

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-env
+  namespace: management
+data:
+  HOST: "t4nello.site"
+  TRAEFIK_ENTRYPOINT: "websecure"
+  TRAEFIK_TLS: "true"

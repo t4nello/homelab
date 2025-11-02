@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  namespace: management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      containers:
+      - name: portainer
+        image: portainer/portainer-ee:latest
+        envFrom:
+        - configMapRef:
+            name: global-env
+        - secretRef:
+            name: portainer-secret
