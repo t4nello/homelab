@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   tunnel:
     image: cloudflare/cloudflared
@@ -75,9 +73,11 @@ services:
       - torrent
 
   portainer:
-    image: portainer/portainer-{PORTAINER_EDITION:-ce}:latest
+    image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
     container_name: portainer
-    command: --host=unix:///var/run/docker.sock "--license-key={PORTAINER_LICENCE_KEY}
+    command: 
+      - --host=unix:///var/run/docker.sock 
+      - --license-key=${PORTAINER_LICENCE_KEY}  
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" 
       - "portainer_data:/data"
