@@ -44,8 +44,6 @@ services:
       - "--providers.docker=true"           
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.qbittorrent-tcp.address=:6881"
-      - "--entrypoints.qbittorrent-udp.address=:6881/udp"
       - "--entrypoints.minecraft.address=:25565"
       - "--metrics.prometheus=true"
     ports:
