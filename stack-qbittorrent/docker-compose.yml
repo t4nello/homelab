@@ -4,6 +4,8 @@ services:
     container_name: qbittorrent
     environment:
       - QBT_LEGAL_NOTICE=confirm
+      - PGID=${PGID}
+      - PUID=${PUID}
     volumes:
       - ${CONFIG_PATH}:/config
       - ${DOWNLOAD_PATH}:/downloads
