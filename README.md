@@ -266,7 +266,7 @@ bash bin/elasticsearch-setup-passwords auto
 
 ### Pi-hole Setup with Docker
 
-####1. Disable systemd-resolved
+#### 1. Disable systemd-resolved
 
 To allow Pi-hole to listen on port 53:
 
