@@ -263,3 +263,70 @@ bash bin/elasticsearch-setup-passwords auto
 ```
 
 3. Use the generated passwords in your environment variables.
+
+### Pi-hole Setup with Docker
+
+####1. Disable systemd-resolved
+
+To allow Pi-hole to listen on port 53:
+
+```bash
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+```
+
+#### 2. Temporarily set an external DNS
+
+This ensures the host and Docker can resolve domains (e.g., to download packages):
+
+```bash
+echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+```
+
+You can also use `8.8.8.8` instead of Cloudflare.
+
+#### 3. Configure Docker to use the correct DNS
+
+Edit or create `/etc/docker/daemon.json`:
+
+```json
+{
+  "dns": ["1.1.1.1"]
+}
+```
+
+#### 4. Restart the Docker engine
+
+```bash
+sudo systemctl restart docker
+```
+
+#### 5. Deploy the Pi-hole stack
+
+Use your `docker-compose.yml` or stack file. Ports 53 (TCP/UDP) will be mapped to the host, allowing Pi-hole to listen locally.
+
+#### 6. Set the host to use Pi-hole as DNS
+
+After Pi-hole is running, configure your host to point to the local Pi-hole:
+
+```bash
+echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+```
+Edit or create `/etc/docker/daemon.json`:
+
+```json
+{
+  "dns": [127.0.0.1"]
+}
+```
+
+#### 7. Test the setup
+
+Verify that your host is using Pi-hole:
+
+```bash
+dig @127.0.0.1 google.com
+```
+
+You should receive an `A` record response, confirming Pi-hole is resolving DNS queries correctly.
+
