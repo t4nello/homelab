@@ -100,7 +100,6 @@ See `ansible` branch for deployment with ansible
 | Name                | Required? | Allowed Values         | Default Value | Description                        |
 | ------------------- | --------- | ---------------------- | ------------- | ---------------------------------- |
 | TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole               |
-| PIHOLEWEBPASSWORD   | YES       | string                 |               | Password for Pi-hole web interface |
 | TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services         |
 | HOST                | YES       | a valid domain address |               | Domain address                     |
 | TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS              |
