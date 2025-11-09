@@ -29,6 +29,7 @@ services:
       - NET_BIND_SERVICE
       - NET_RAW
       - CAP_NET_ADMIN
+      - CAP_SYS_TIME 
 
 networks:
   management:
