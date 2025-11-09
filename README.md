@@ -321,8 +321,13 @@ Edit or create `/etc/docker/daemon.json`:
   "dns": [127.0.0.1"]
 }
 ```
+#### 7. Restart the Docker engine
 
-#### 7. Test the setup
+```bash
+sudo systemctl restart docker
+```
+
+#### 8. Test the setup
 
 Verify that your host is using Pi-hole:
 
