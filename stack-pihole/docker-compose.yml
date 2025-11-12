@@ -5,6 +5,10 @@ services:
     image: pihole/pihole:latest
     container_name: pihole
     hostname: pihole
+    depends_on:
+      cloudflaredns:
+        condition: service_healthy
+        restart: true
     restart: unless-stopped
     networks:
       - management

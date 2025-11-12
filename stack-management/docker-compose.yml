@@ -21,6 +21,11 @@ services:
     image: cloudflare/cloudflared
     container_name: cloudflaredns
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "dig", "@127.0.0.1", "cloudflare.com"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     environment:
       - TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query
       - TUNNEL_DNS_PORT=5053
