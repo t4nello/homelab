@@ -11,9 +11,7 @@ services:
       - ${DOWNLOAD_PATH}:/downloads
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
       - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
-      - "traefik.http.routers.qbittorrent.tls=${TRAEFIK_TLS:-true}"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
       - "traefik.docker.network=torrent"
     restart: unless-stopped

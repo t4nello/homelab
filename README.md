@@ -44,9 +44,7 @@ See `ansible` branch for deployment with ansible
 
 | Name                | Required? | Allowed Values         | Default Value | Description                                        |
 | ------------------- | --------- | ---------------------- | ------------- | -------------------------------------------------- |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services                         |
 | HOST                | YES       | a valid domain address |               | Domain address                                     |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS                              |
 | ES\_PASSWORD        | YES       | string                 |               | Elasticsearch password (see additional info below) |
 | KIBANA\_PASSWORD    | YES       | string                 |               | Kibana password (see additional info below)        |
 
@@ -55,20 +53,15 @@ See `ansible` branch for deployment with ansible
 | Name                    | Required?                          | Allowed Values                   | Default Value | Description                                                 |
 | ----------------------- | ---------------------------------- | -------------------------------- | ------------- | ----------------------------------------------------------- |
 | TUNNEL\_TOKEN           | YES                                | String                           |               | Token provided by Cloudflare Zero Trust Zone                |
-| TRAEFIK\_ENTRYPOINT     | NO                                 | web/websecure                    | websecure     | Entrypoint of the services                                  | 
 | HOST                    | YES                                | A valid domain address           |               | Domain address                                              |
-| TRAEFIK\_TLS            | NO                                 | true/false                       | true          | Enable or disable TLS                                       |
 | PORTAINER\_EDITION      | NO                                 | ce/ee                            | ce            | Determines the community or enterprise version of Portainer |
-| PORTAINER\_PASSWORD     | YES                                | String                           |               | Password for portainer WebGui password                      |
 | PORTAINER\_LICENCE\_KEY | if PORTAINER\_EDITION is set to ee | String                           |               | Portainer EE licence key                                    |
 
 ### Monitoring
 
 | Name                | Required? | Allowed Values         | Default Value | Description                |
 | ------------------- | --------- | ---------------------- | ------------- | -------------------------- |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services |
 | HOST                | YES       | a valid domain address |               | Domain address             |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS      |
 
 ### Filebrowser
 
@@ -78,9 +71,7 @@ See `ansible` branch for deployment with ansible
 | GUID                | NO        | valid group ID             | 1000          | Group ID                                                             |
 | BROWSING\_PATH      | YES       | absolute path to directory |               | Path to directory                                                    |
 | CONFIG\_PATH        | YES       | absolute path to config    |               | Path to config directory with config.json and empty database.db file |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure              | websecure     | Entrypoint of the services                                           |
 | HOST                | YES       | a valid domain address     |               | Domain address                                                       |
-| TRAEFIK\_TLS        | NO        | true/false                 | true          | Enable or disable TLS                                                |
 
 ### Guacamole
 
@@ -91,18 +82,14 @@ See `ansible` branch for deployment with ansible
 | MYSQL\_USER           | NO        | string                 | admin         | MySQL username             |
 | MYSQL\_PASSWORD       | YES       | string                 |               | MySQL password for user    |
 | MYSQL\_ROOT\_PASSWORD | YES       | string                 |               | MySQL password for root    |
-| TRAEFIK\_ENTRYPOINT   | NO        | web/websecure          | websecure     | Entrypoint of the services |
 | HOST                  | YES       | a valid domain address |               | Domain address             |
-| TRAEFIK\_TLS          | NO        | true/false             | true          | Enable or disable TLS      |
 
 ### Pi-hole
 
 | Name                | Required? | Allowed Values         | Default Value | Description                        |
 | ------------------- | --------- | ---------------------- | ------------- | ---------------------------------- |
 | TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole               |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services         |
 | HOST                | YES       | a valid domain address |               | Domain address                     |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS              |
 
 ### qBittorrent
 
@@ -110,9 +97,7 @@ See `ansible` branch for deployment with ansible
 | ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------ |
 | CONFIG\_PATH        | YES       | absolute path          |               | Path to config directory                   |
 | DOWNLOAD\_PATH      | YES       | absolute path          |               | Path where downloaded files will be stored |
-| TRAEFIK\_ENTRYPOINT | NO        | web/websecure          | websecure     | Entrypoint of the services                 |
 | HOST                | YES       | a valid domain address |               | Domain address                             |
-| TRAEFIK\_TLS        | NO        | true/false             | true          | Enable or disable TLS                      |
 
 ---
 

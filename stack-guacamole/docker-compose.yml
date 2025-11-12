@@ -17,10 +17,7 @@ services:
     container_name: guacamole
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.guacamole.rule=Host(`guacamole.t4nello.site`)"
-      - "traefik.http.routers.guacamole.entryPoints=websecure"
-      - "traefik.http.routers.guacamole.tls=true"
-      - "traefik.http.routers.guacamole.priority=15"
+      - "traefik.http.routers.guacamole.rule=Host(`guacamole.${HOST}`)"
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
       - "traefik.docker.network=management"
     environment:

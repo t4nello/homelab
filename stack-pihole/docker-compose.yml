@@ -19,9 +19,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.pihole.rule=Host(`pihole.${HOST}`)"
-      - "traefik.http.routers.pihole.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
-      - "traefik.http.routers.pihole.tls=${TRAEFIK_TLS:-true}"
       - "traefik.docker.network=management"
     cap_add:
       - NET_ADMIN 
