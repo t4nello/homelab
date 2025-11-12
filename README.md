@@ -162,23 +162,6 @@ Use Portainer to deploy other stacks. Refer to the **"Additional Info for stacks
 
 ## Additional Info for Stacks
 
-### Filebrowser
-
-Create a directory containing `config.json` and an empty `database.db` file. Example `config.json`:
-
-```json
-{
-  "port": 80,
-  "baseURL": "",
-  "address": "",
-  "log": "stdout",
-  "database": "/database.db",
-  "root": "/srv"
-}
-```
-
-Set `CONFIG_PATH` to the absolute path of this directory.
-
 ### Guacamole
 
 You need to build a MySQL image with init scripts to create the proper database schema and an initial user `guacadmin` / `guacadmin`.

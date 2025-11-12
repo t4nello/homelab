@@ -7,7 +7,7 @@ services:
       - PGID=${PGID}
       - PUID=${PUID}
     volumes:
-      - ${CONFIG_PATH}:/config
+      - ./config:/config
       - ${DOWNLOAD_PATH}:/downloads
     labels:
       - "traefik.enable=true"

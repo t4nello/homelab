@@ -8,8 +8,8 @@ services:
     user: "${PUID:-1000}:${GUID:-1000}"
     volumes:
       - ${BROWSING_PATH}:/srv
-      - ${CONFIG_PATH}/database.db:/database.db
-      - ${CONFIG_PATH}/config.json:/config.json
+      - ./config/database.db:/database.db
+      - ./config/config.json:/config.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.filebrowser.rule=Host(`fb.${HOST}`)"
