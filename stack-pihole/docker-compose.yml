@@ -6,7 +6,7 @@ services:
     container_name: pihole
     hostname: pihole
     depends_on:
-      cloudflaredns:
+      cloudflared:
         condition: service_healthy
         restart: true
     restart: unless-stopped
