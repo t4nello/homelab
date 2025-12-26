@@ -180,18 +180,21 @@ docker build -t mysql/guacamole -f mysql.Dockerfile .
 Since a bridge network is used, WoL packets must be routed to your home LAN.
 
 ##### Steps:
-
-1. Move the `wol-relay.sh` script to `/usr/bin/` and make it executable:
+1. install socat package
+```bash
+sudo apt install socat
+```
+2. Copy the `wol-relay.sh` script to `/usr/bin/` and make it executable:
 
 ```bash
-sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.sh /usr/bin/wol-relay.sh
+sudo cp <repo>/stack-guacamole/wol-scripts/wol-relay.sh /usr/bin/wol-relay.sh
 sudo chmod +x /usr/bin/wol-relay.sh
 ```
 
-2. Move the `wol-relay.service` file to the systemd directory:
+2. Copy the `wol-relay.service` file to the systemd directory:
 
 ```bash
-sudo mv <repo>/stack-guacamole/wol-scripts/wol-relay.service /etc/systemd/system/
+sudo cp <repo>/stack-guacamole/wol-scripts/wol-relay.service /etc/systemd/system/
 ```
 3. Enable and start the service:
 
