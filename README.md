@@ -175,7 +175,7 @@ docker build -t mysql/guacamole -f mysql.Dockerfile .
 
 #### Wake-on-LAN (WoL) Setup for Guacamole (version 1.5.5)
 
-**Important:** Guacamole version **1.5.5** is recommended. Version **1.6.0** has known issues with WoL.
+**Important:** Guacamole version **1.5.5** is recommended. Version **1.6.0** has known issues with WoL. https://issues.apache.org/jira/projects/GUACAMOLE/issues/GUACAMOLE-2107?filter=allissues
 
 Since a bridge network is used, WoL packets must be routed to your home LAN.
 
