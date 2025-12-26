@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   guacd:
-    image: guacamole/guacd
+    image: guacamole/guacd:latest
     container_name: guacd
     environment:
       - "GUACD_LOG_LEVEL=debug"
@@ -13,7 +13,7 @@ services:
     - guacd-record:/record:rw
     
   guacamole:
-    image: guacamole/guacamole
+    image: guacamole/guacamole:latest
     container_name: guacamole
     labels:
       - "traefik.enable=true"
