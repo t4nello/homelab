@@ -54,7 +54,7 @@ networks:
   management:
     external: true
   guacd:
-    driver: bridge
+    external: true
 
   
 
