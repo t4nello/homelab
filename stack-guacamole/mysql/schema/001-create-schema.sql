@@ -21,7 +21,6 @@
 -- Table of connection groups. Each connection group has a name.
 --
 
-
 CREATE TABLE `guacamole_connection_group` (
 
   `connection_group_id`   int(11)      NOT NULL AUTO_INCREMENT,
@@ -460,6 +459,7 @@ CREATE TABLE `guacamole_system_permission` (
                     'CREATE_SHARING_PROFILE',
                     'CREATE_USER',
                     'CREATE_USER_GROUP',
+                    'AUDIT',
                     'ADMINISTER') NOT NULL,
 
   PRIMARY KEY (`entity_id`,`permission`),
@@ -612,3 +612,4 @@ CREATE TABLE guacamole_user_password_history (
     REFERENCES `guacamole_user` (`user_id`) ON DELETE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
