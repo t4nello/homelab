@@ -35,6 +35,8 @@ services:
     networks:
       - guacd
       - management
+    volumes:
+      - guacd-record:/record:rw
 
   mysql:
     image: mysql:latest
