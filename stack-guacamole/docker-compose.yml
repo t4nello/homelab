@@ -32,7 +32,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
       - RECORDING_ENABLED=true
-      - RECORDING_SEARCH_PATH=/record
+      - RECORDING_SEARCH_PATH=/recordings
     restart: on-failure:5
     networks:
       - guacd
