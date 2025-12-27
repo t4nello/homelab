@@ -6,12 +6,12 @@ services:
     container_name: guacd
     environment:
       - LOG_LEVEL=debug
-      - RECORDING_SEARCH_PATH=/record
     restart: on-failure:5
     networks:
       - guacd
     volumes:
-    - guacd-record:/record:rw
+    - ./logs/recordings:/recordings
+    - ./logs/typescript:/typescript
     
   guacamole:
     image: guacamole/guacamole:latest
@@ -38,7 +38,8 @@ services:
       - guacd
       - management
     volumes:
-      - guacd-record:/record:rw
+    - ./logs/recordings:/recordings
+    - ./logs/typescript:/typescript
 
   mysql:
     image: mysql:latest
@@ -64,7 +65,5 @@ networks:
   
 
 volumes:
-  guacd-record: 
-    name: guacd-record
   mysql-data: 
     name: mysql-data
