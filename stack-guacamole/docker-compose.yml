@@ -5,7 +5,7 @@ services:
     image: guacamole/guacd:latest
     container_name: guacd
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=trace
       - RECORDING_SEARCH_PATH=/recordings
     restart: on-failure:5
     networks:
@@ -23,6 +23,7 @@ services:
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
       - "traefik.docker.network=management"
     environment:
+      - LOG_LEVEL=trace
       - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
       - MYSQL_HOSTNAME=mysql
       - GUACD_PORT=${GUACD_PORT:-4822}
