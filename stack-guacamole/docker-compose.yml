@@ -34,6 +34,7 @@ services:
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
       - RECORDING_ENABLED=true
       - RECORDING_SEARCH_PATH=/recordings
+      - REMOTE_IP_VALVE_ENABLED=true
     restart: on-failure:5
     networks:
       - guacd
