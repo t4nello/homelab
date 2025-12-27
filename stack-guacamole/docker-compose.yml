@@ -15,8 +15,6 @@ services:
   guacamole:
     image: guacamole/guacamole:latest
     container_name: guacamole
-    environment:
-      - "RECORDING_ENABLED=true"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.guacamole.rule=Host(`guacamole.${HOST}`)"
@@ -32,6 +30,7 @@ services:
       - MYSQL_USER=guacamole
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
+      - RECORDING_ENABLED=true
     restart: on-failure:5
     networks:
       - guacd
