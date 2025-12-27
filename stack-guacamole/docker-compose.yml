@@ -10,7 +10,8 @@ services:
     networks:
       - guacd
     volumes:
-    -  guacamole-data:/var/lib/guacamole/recordings:rw
+    -  /mnt/shared/guacamole/recordings:/var/lib/guacamole/recordings:rw
+    -  /mnt/shared/guacamole/typescript:/var/lib/guacamole/typescript:rw
     
   guacamole:
     image: guacamole/guacamole:latest
@@ -37,8 +38,8 @@ services:
       - guacd
       - management
     volumes:
-    -  guacamole-data:/var/lib/guacamole/recordings:rw
-
+    -  /mnt/shared/guacamole/recordings:/var/lib/guacamole/recordings:rw
+    -  /mnt/shared/guacamole/typescript:/var/lib/guacamole/typescript:rw
   mysql:
     image: mysql:latest
     container_name: mysql
@@ -65,5 +66,3 @@ networks:
 volumes:
   mysql-data: 
     name: mysql-data
-  guacamole-data:
-    name: guacamole-data
