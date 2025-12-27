@@ -11,8 +11,8 @@ services:
     networks:
       - guacd
     volumes:
-    - ./logs/recordings:/recordings
-    - ./logs/typescript:/typescript
+    - ./logs/recordings:/recordings:rw
+    - ./logs/typescript:/typescript:rw
     
   guacamole:
     image: guacamole/guacamole:latest
@@ -39,8 +39,8 @@ services:
       - guacd
       - management
     volumes:
-    - ./logs/recordings:/recordings
-    - ./logs/typescript:/typescript
+    - ./logs/recordings:/recordings:rw
+    - ./logs/typescript:/typescript:rw
 
   mysql:
     image: mysql:latest
