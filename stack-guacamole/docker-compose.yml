@@ -6,13 +6,12 @@ services:
     container_name: guacd
     environment:
       - LOG_LEVEL=trace
-      - RECORDING_SEARCH_PATH=/recordings
     restart: on-failure:5
     networks:
       - guacd
     volumes:
-    - ./logs/recordings:/recordings:rw
-    - ./logs/typescript:/typescript:rw
+    -  guacamole-data/recordings:/var/lib/guacamole/recordings:rw
+    -  guacamole-data/typescript:/var/lib/guacamole/typescript:rw
     
   guacamole:
     image: guacamole/guacamole:latest
@@ -33,15 +32,14 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
       - RECORDING_ENABLED=true
-      - RECORDING_SEARCH_PATH=/recordings
       - REMOTE_IP_VALVE_ENABLED=true
     restart: on-failure:5
     networks:
       - guacd
       - management
     volumes:
-    - ./logs/recordings:/recordings:rw
-    - ./logs/typescript:/typescript:rw
+    -  guacamole-data/recordings:/var/lib/guacamole/recordings:rw
+    -  guacamole-data/typescript:/var/lib/guacamole/typescript:rw
 
   mysql:
     image: mysql:latest
@@ -69,3 +67,5 @@ networks:
 volumes:
   mysql-data: 
     name: mysql-data
+  guacamole-data:
+    name: guacamole-data
