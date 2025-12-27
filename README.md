@@ -75,15 +75,16 @@ See `ansible` branch for deployment with ansible
 
 ### Guacamole
 
-| Name                  | Required? | Allowed Values         | Default Value | Description                |
-| --------------------- | --------- | ---------------------- | ------------- | -------------------------- |
-| GUACD\_PORT           | NO        | 0-65535                | 4822          | Guacd port                 |
-| MYSQL\_PORT           | NO        | 0-65535                | 3306          | MySQL database port        |
-| MYSQL\_USER           | NO        | string                 | admin         | MySQL username             |
-| MYSQL\_PASSWORD       | YES       | string                 |               | MySQL password for user    |
-| MYSQL\_ROOT\_PASSWORD | YES       | string                 |               | MySQL password for root    |
-| HOST                  | YES       | a valid domain address |               | Domain address             |
-
+| Name                     | Required? | Allowed Values            | Default Value | Description                                                 |
+| ---------------------    | --------- | ------------------------- | ------------- | ----------------------------------------------------------- |
+| GUACD\_PORT              | NO        | 0-65535                   | 4822          | Guacd port                                                  |
+| MYSQL\_PORT              | NO        | 0-65535                   | 3306          | MySQL database port                                         |
+| MYSQL\_USER              | NO        | string                    | admin         | MySQL username                                              |
+| MYSQL\_PASSWORD          | YES       | string                    |               | MySQL password for user                                     |
+| MYSQL\_ROOT\_PASSWORD    | YES       | string                    |               | MySQL password for root                                     |
+| HOST                     | YES       | a valid domain address    |               | Domain address                                              |
+| GUACAMOLE_VERSION        | NO        | a valid version           |               | Version of deployed guacamole. WoL works on 1.5.5           |
+| GUACAMOLE_RECORDING_PATH | YES       |absolute path to directory |               | Path where session recordings and typescript will be saved  |
 ### Pi-hole
 
 | Name                | Required? | Allowed Values         | Default Value | Description                        |
@@ -177,7 +178,7 @@ docker build -t mysql/guacamole -f mysql.Dockerfile .
 
 **Important:** Guacamole version **1.5.5** is recommended. Version **1.6.0** has known issues with WoL. https://issues.apache.org/jira/projects/GUACAMOLE/issues/GUACAMOLE-2107?filter=allissues
 
-Since a bridge network is used, WoL packets must be routed to your home LAN.
+Since a bridge network is used, WoL packets must be routed to your home LAN with specially prepared script
 
 ##### Steps:
 1. install socat package
@@ -276,7 +277,7 @@ sudo systemctl restart docker
 
 #### 5. Deploy the Pi-hole stack
 
-Use your `docker-compose.yml` or stack file. Ports 53 (TCP/UDP) will be mapped to the host, allowing Pi-hole to listen locally.
+Use prepared `docker-compose.yml' in stack-pihole directory. Ports 53 (TCP/UDP) will be mapped to the host, allowing Pi-hole to listen locally.
 
 #### 6. Set the host to use Pi-hole as DNS
 

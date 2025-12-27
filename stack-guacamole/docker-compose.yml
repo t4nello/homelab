@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   guacd:
-    image: guacamole/guacd:latest
+    image: guacamole/guacd:${GUACAMOLE_VERSION:-latest}
     container_name: guacd
     environment:
       - LOG_LEVEL=trace
@@ -12,7 +12,7 @@ services:
     volumes:
     -  ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
   guacamole:
-    image: guacamole/guacamole:latest
+    image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
     container_name: guacamole
     labels:
       - "traefik.enable=true"
