@@ -26,7 +26,6 @@ services:
       - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
       - MYSQL_HOSTNAME=mysql
       - GUACD_PORT=${GUACD_PORT:-4822}
-      - EXTENSION_PRIORITY=mysql
       - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_DATABASE=guacamole_db
       - MYSQL_USER=guacamole
