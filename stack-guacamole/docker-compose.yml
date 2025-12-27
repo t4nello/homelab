@@ -5,7 +5,8 @@ services:
     image: guacamole/guacd:latest
     container_name: guacd
     environment:
-      - "LOG_LEVEL=debug"
+      - LOG_LEVEL=debug
+      - RECORDING_SEARCH_PATH=/record
     restart: on-failure:5
     networks:
       - guacd
@@ -31,6 +32,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
       - RECORDING_ENABLED=true
+      - RECORDING_SEARCH_PATH=/record
     restart: on-failure:5
     networks:
       - guacd
