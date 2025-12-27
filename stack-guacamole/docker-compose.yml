@@ -6,6 +6,7 @@ services:
     container_name: guacd
     environment:
       - LOG_LEVEL=trace
+      - RECORDING_SEARCH_PATH=/recordings
     restart: on-failure:5
     networks:
       - guacd
