@@ -5,7 +5,7 @@ services:
     image: guacamole/guacd:latest
     container_name: guacd
     environment:
-      - "GUACD_LOG_LEVEL=debug"
+      - "LOG_LEVEL=debug"
     restart: on-failure:5
     networks:
       - guacd
