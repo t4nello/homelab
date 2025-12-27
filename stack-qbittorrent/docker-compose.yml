@@ -1,11 +1,11 @@
 services:
   qbittorrent:
-    image: qbittorrentofficial/qbittorrent-nox:latest
+    image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      - QBT_LEGAL_NOTICE=confirm
       - PGID=${PGID}
       - PUID=${PUID}
+      - TZ=Europe/Warsaw
     volumes:
       - ./config:/config
       - ${DOWNLOAD_PATH}:/downloads
