@@ -38,6 +38,10 @@ See `ansible` branch for deployment with ansible
 
   * qBittorrent
 
+* **Stirling**
+
+  * Stirling-PDF
+
 ## Environment Variables
 
 ### EFK
@@ -85,6 +89,7 @@ See `ansible` branch for deployment with ansible
 | HOST                     | YES       | a valid domain address    |               | Domain address                                              |
 | GUACAMOLE_VERSION        | NO        | a valid version           |               | Version of deployed guacamole. WoL works on 1.5.5           |
 | GUACAMOLE_RECORDING_PATH | YES       |absolute path to directory |               | Path where session recordings and typescript will be saved  |
+
 ### Pi-hole
 
 | Name                | Required? | Allowed Values         | Default Value | Description                        |
@@ -99,6 +104,14 @@ See `ansible` branch for deployment with ansible
 | CONFIG\_PATH        | YES       | absolute path          |               | Path to config directory                   |
 | DOWNLOAD\_PATH      | YES       | absolute path          |               | Path where downloaded files will be stored |
 | HOST                | YES       | a valid domain address |               | Domain address                             |
+
+
+### Stirling-PDF
+
+| Name                | Required? | Allowed Values         | Default Value | Description                                       |
+| ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------------- |
+| LOCALE              | No        | locale code            | pl-PL         | Locale used for language and regional formatting  |
+| HOST                | YES       | a valid domain address |               | Domain address                                    |
 
 ---
 
@@ -121,8 +134,9 @@ cd homelab/stack-management
 ```bash
 docker network create --opt com.docker.network.bridge.name=management management
 docker network create --opt com.docker.network.bridge.name=monitoring monitoring
-docker network create --opt com.docker.network.bridge.name=torrent torrent
+docker network create --opt com.docker.network.bridge.name=applications applications
 docker network create --opt com.docker.network.bridge.name=guacd guacd
+docker network create --opt com.docker.network.bridge.name=logging logging
 ```
 
 ### 4. Create a `.env` file

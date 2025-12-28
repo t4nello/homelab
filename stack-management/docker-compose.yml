@@ -63,7 +63,8 @@ services:
     networks:
       - management
       - monitoring
-      - torrent
+      - applications
+      - logging
 
   portainer:
     image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
@@ -90,8 +91,11 @@ networks:
     external: true
   monitoring:
     external: true
-  torrent:
+  applications:
+    external: true
+  logging:
     external: true
 
 volumes:
    portainer_data:
+    name: portainer_data

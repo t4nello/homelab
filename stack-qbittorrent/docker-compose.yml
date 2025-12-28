@@ -13,10 +13,10 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
-      - "traefik.docker.network=torrent"
+      - "traefik.docker.network=applications"
     restart: unless-stopped
     networks:
-      - torrent
+      - applications
 networks:
-  torrent:
+  applications:
     external: true

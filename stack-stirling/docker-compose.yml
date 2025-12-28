@@ -1,0 +1,28 @@
+services:
+  stirlingpdf:
+    image: stirlingtools/stirling-pdf:latest-fat
+    container_name: stirlingpdf
+    environment:
+      - DISABLE_ADDITIONAL_FEATURES=false
+      - DOCKER_ENABLE_SECURITY=false
+      - SYSTEM_DEFAULTLOCALE=${LOCALE-:pl-PL}
+      - SYSTEM_MAXFILESIZE=100
+      - METRICS_ENABLED=true
+    volumes:
+      - stirling_data:/configs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.stirlingpdf.rule=Host(`stirling.${HOST}`)"
+      - "traefik.http.services.stirlingpdf.loadbalancer.server.port=8080"
+      - "traefik.docker.network=applications"
+    restart: unless-stopped
+    networks:
+      - applications
+
+volumes:
+  stirling_data:
+    name: stirling_data
+
+networks:
+  torrent:
+    external: true
