@@ -178,16 +178,6 @@ Use Portainer to deploy other stacks. Refer to the **"Additional Info for stacks
 ## Additional Info for Stacks
 
 ### Guacamole
-
-You need to build a MySQL image with init scripts to create the proper database schema and an initial user `guacadmin` / `guacadmin`.
-
-Scripts and Dockerfile are located in the `stack-guacamole` directory.
-You can build the image via Portainer or CLI:
-
-```bash
-docker build -t mysql/guacamole -f mysql.Dockerfile .
-```
-
 #### Wake-on-LAN (WoL) Setup for Guacamole (version 1.5.5)
 
 **Important:** Guacamole version **1.5.5** is recommended. Version **1.6.0** has known issues with WoL. https://issues.apache.org/jira/projects/GUACAMOLE/issues/GUACAMOLE-2107?filter=allissues
