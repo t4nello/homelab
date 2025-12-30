@@ -7,8 +7,9 @@ services:
       - PUID=${PUID}
       - TZ=Europe/Warsaw
     volumes:
-      - ./config:/config
+      - qbitrorent-data:/config
       - ${DOWNLOAD_PATH}:/downloads
+      - ${PLUGINS_PATH}:/plugins
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
@@ -20,3 +21,7 @@ services:
 networks:
   applications:
     external: true
+
+volumes:
+  qbitrorent-data: 
+    name: qbitrorent-data
