@@ -9,7 +9,6 @@ services:
     volumes:
       - qbitrorent-data:/config
       - ${DOWNLOAD_PATH}:/downloads
-      - ${PLUGINS_PATH}:/plugins
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
