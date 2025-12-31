@@ -1,8 +1,9 @@
 services:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent
     environment:
+      - QBT_LEGAL_NOTICE=confirm
       - PGID=${PGID}
       - PUID=${PUID}
       - TZ=Europe/Warsaw
