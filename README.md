@@ -101,7 +101,6 @@ See `ansible` branch for deployment with ansible
 
 | Name                | Required? | Allowed Values         | Default Value | Description                                |
 | ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------ |
-| CONFIG\_PATH        | YES       | absolute path          |               | Path to config directory                   |
 | DOWNLOAD\_PATH      | YES       | absolute path          |               | Path where downloaded files will be stored |
 | HOST                | YES       | a valid domain address |               | Domain address                             |
 
@@ -222,6 +221,14 @@ runas /u:MicrosoftAccount\your@email.com cmd.exe
 3. A Command Prompt will be shown, type your current Microsoft Account password and enter.
 Now, you can connect to that computer via Remote Desktop.
 You can find the detail here https://nready.net/remote-desktop-on-windows-11-with-microsoft-account-mfa/
+
+##### Storing recording from sessions:
+According to documentation, directory where logs will be stored have to be owned by user 1000 and group 1001
+
+```bash
+sudo chown -R 1000:1001 {GUACAMOLE_RECORDING_PATH}
+sudo chmod -R 2750 {GUACAMOLE_RECORDING_PATH}
+```
 
 
 ### EFK
