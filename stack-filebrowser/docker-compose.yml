@@ -6,7 +6,7 @@ services:
     user: "${PUID:-1000}:${GUID:-1000}"
     volumes:
       - ${BROWSING_PATH}:/srv
-      - ./config/database.db:/database.db
+      - filebrowser-data:/database
       - ./config/config.json:/config.json
     labels:
       - "traefik.enable=true"
@@ -18,7 +18,18 @@ services:
       - PGID=${GUID:-1000}
     networks:
       - applications
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: fliebrowser
+          fluentd-async: "true"
+
 
 networks:
   applications:
     external: true 
+
+volumes:
+   filebrowser-data:
+    name: filebrowser-data

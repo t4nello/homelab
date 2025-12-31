@@ -1,12 +1,12 @@
 services:
-  tunnel:
+  cloudflared-tunnel:
     image: cloudflare/cloudflared
-    container_name: cloudflared
+    container_name: cloudflared-tunnel
     restart: unless-stopped
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-      - TUNNEL_LOGLEVEL=debug
+      - TUNNEL_LOGLEVEL=info
       - TUNNEL_METRICS=0.0.0.0:60123
     healthcheck:
       test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
@@ -16,25 +16,12 @@ services:
     networks:
       - management
       - monitoring
-  
-  cloudflared:
-    image: cloudflare/cloudflared
-    container_name: cloudflaredns
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "dig", "@127.0.0.1", "cloudflare.com"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    environment:
-      - TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query
-      - TUNNEL_DNS_PORT=5053
-      - TUNNEL_DNS_ADDRESS=0.0.0.0
-      - TUNNEL_METRICS=0.0.0.0:60124
-    command: proxy-dns
-    networks:
-      - management
-      - monitoring
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: cloudflared-tunnel
+          fluentd-async: "true"
 
   traefik:
     image: traefik:v3.6
@@ -65,6 +52,12 @@ services:
       - monitoring
       - applications
       - logging
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: traefik
+          fluentd-async: "true"
 
   portainer:
     image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
@@ -85,6 +78,12 @@ services:
     restart: unless-stopped
     networks:
       - management
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: portainer
+          fluentd-async: "true"
 
 networks:
   management:

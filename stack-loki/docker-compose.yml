@@ -1,0 +1,29 @@
+services:
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    container_name: fluent-bit
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    volumes:
+      - ./config/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    networks:
+      - monitoring
+      - management
+      - guacd
+      - applications
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    networks:
+      - monitoring
+
+networks:
+  management:
+    external: true
+  monitoring:
+    external: true
+  guacd:
+    external: true
+  applications:
+    external: true

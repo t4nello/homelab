@@ -27,6 +27,12 @@ services:
       - CAP_NET_ADMIN
       - CAP_SYS_TIME 
       - CAP_SYS_NICE 
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: pihole
+          fluentd-async: "true"
 
 networks:
   applications:

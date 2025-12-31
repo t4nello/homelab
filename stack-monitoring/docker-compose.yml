@@ -19,6 +19,12 @@ services:
       retries: 3
     networks:
       - monitoring
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: node-exporter
+          fluentd-async: "true"
 
   prometheus:
     image: prom/prometheus:latest
@@ -47,6 +53,12 @@ services:
       retries: 3
     networks:
       - monitoring
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: prometheus
+          fluentd-async: "true"
     
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -59,6 +71,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: cadvisor
+          fluentd-async: "true"
 
   grafana:
     image: grafana/grafana:latest
@@ -83,6 +101,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: grafana
+          fluentd-async: "true"
 
 networks:
   monitoring:

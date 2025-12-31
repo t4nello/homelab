@@ -18,9 +18,17 @@ services:
     restart: unless-stopped
     networks:
       - applications
+    logging:
+      driver: fluentd
+      options:
+          fluentd-address: fluent-bit:24224
+          tag: qbittorrent
+          fluentd-async: "true"
+
 networks:
   applications:
     external: true
+
 
 volumes:
   qbitrorent-data: 

@@ -14,18 +14,10 @@ scrape_configs:
     static_configs:
       - targets: ['traefik:8080']
   
-  - job_name: OpenWrt
-    static_configs:
-      - targets: [192.168.0.2:9123]
-  
   - job_name: cloudflared
     static_configs:
       - targets: [cloudflared:60123]
-  
-  - job_name: cloudflaredns
-    static_configs:
-      - targets: [cloudflaredns:60124]
-      
+        
   - job_name: cadvisor
     static_configs:
       - targets: [cadvisor:8080]
