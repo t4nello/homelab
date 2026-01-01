@@ -7,7 +7,7 @@ services:
     volumes:
       - ${BROWSING_PATH}:/srv
       - filebrowser-data:/database
-      - ./config/config.json:/config.json
+      - ${CONFIG_PATH:-.}/config/config.json:/config.json
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
