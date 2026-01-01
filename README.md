@@ -284,20 +284,6 @@ Understanding how traffic flows through this homelab setup:
 2. **Traefik** acts as a Reverse Proxy, handling SSL and routing traffic to specific containers based on the hostname.
 3. **Isolated Networks** (`management`, `monitoring`, `applications`) ensure that containers only communicate with what they need to.
 
-
-## License & Acknowledgments
-
-### Project License
-This project is licensed under the [MIT License](LICENSE).
-
-### Credits
-This HomeLab setup is built thanks to the amazing open-source community. Special thanks to:
-* **Traefik Proxy** - Cloud-native edge router.
-* **Portainer** - Making Docker management easy.
-* **The Prometheus & Grafana teams** - For the industry-standard monitoring stack.
-* **Apache Guacamole** - For seamless remote access.
-* **LinuxServer.io** - For their high-quality Docker images (qBittorrent, Filebrowser).
-
 ---
 
 ## Disclaimer
