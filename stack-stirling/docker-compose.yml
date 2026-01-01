@@ -11,6 +11,7 @@ services:
     volumes:
       - stirling_data:/configs
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.stirlingpdf.rule=Host(`stirling.${HOST}`)"
       - "traefik.http.services.stirlingpdf.loadbalancer.server.port=8080"
@@ -18,12 +19,7 @@ services:
     restart: unless-stopped
     networks:
       - applications
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: stirlingpdf
-          fluentd-async: "true"
+
 
 volumes:
   stirling_data:

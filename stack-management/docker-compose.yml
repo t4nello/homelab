@@ -4,6 +4,8 @@ services:
     container_name: cloudflared-tunnel
     restart: unless-stopped
     command: tunnel run
+    labels:
+      - "logaggregation=yes"
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
       - TUNNEL_LOGLEVEL=info
@@ -16,12 +18,6 @@ services:
     networks:
       - management
       - monitoring
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: cloudflared-tunnel
-          fluentd-async: "true"
 
   traefik:
     image: traefik:v3.6
@@ -40,6 +36,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - ./usersfile:/usersfile
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true" 
       - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
@@ -51,13 +48,6 @@ services:
       - management
       - monitoring
       - applications
-      - logging
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: traefik
-          fluentd-async: "true"
 
   portainer:
     image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
@@ -71,6 +61,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock" 
       - "portainer_data:/data"
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true" 
       - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
@@ -78,12 +69,6 @@ services:
     restart: unless-stopped
     networks:
       - management
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: portainer
-          fluentd-async: "true"
 
 networks:
   management:
@@ -91,8 +76,6 @@ networks:
   monitoring:
     external: true
   applications:
-    external: true
-  logging:
     external: true
 
 volumes:

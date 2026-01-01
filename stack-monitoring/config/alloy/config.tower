@@ -1,0 +1,67 @@
+
+discovery.docker "logs_integrations_docker" {
+    host = "unix:///var/run/docker.sock"
+    refresh_interval = "5s"
+}
+
+discovery.relabel "logs_integrations_docker" {
+    targets = []
+
+        rule {
+            target_label = "instance"
+            replacement = constants.hostname
+        }
+
+        rule {
+            source_labels = ["__meta_docker_container_name"]
+            regex = "/(.*)"
+            target_label = "container"
+        }
+
+        rule {
+            source_labels = ["__meta_docker_container_log_stream"]
+            target_label = "stream"
+        }
+}
+    
+loki.source.docker "logs_integrations_docker" {
+    host = "unix:///var/run/docker.sock"
+    targets = discovery.docker.logs_integrations_docker.targets
+    forward_to = [loki.write.local_loki.receiver]
+    relabel_rules = discovery.relabel.logs_integrations_docker.rules
+    refresh_interval = "5s"
+}
+
+loki.write "local_loki" {
+    endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+    }
+}
+
+prometheus.exporter.unix "node" {}
+
+prometheus.scrape "node" {
+    targets    = prometheus.exporter.unix.node.targets
+    forward_to = [prometheus.remote_write.local_prom.receiver]
+}
+
+prometheus.scrape "cadvisor" {
+    targets    = [{ "__address__" = "cadvisor:8080" }]
+    forward_to = [prometheus.remote_write.local_prom.receiver]
+}
+
+prometheus.scrape "traefik" {
+    targets    = [{ "__address__" = "traefik:8082" }]
+    forward_to = [prometheus.remote_write.local_prom.receiver]
+}
+
+prometheus.scrape "cloudflared" {
+    targets    = [{ "__address__" = "cloudflared:60123" }]
+    forward_to = [prometheus.remote_write.local_prom.receiver]
+}
+
+prometheus.remote_write "local_prom" {
+    endpoint {
+        url = "http://prometheus:9090/api/v1/write"
+    }
+}

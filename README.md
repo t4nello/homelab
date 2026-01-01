@@ -6,51 +6,36 @@ See `ansible` branch for deployment with ansible
 
 ## Stacks and Applications
 
-* **EFK**
-
-  * Elasticsearch
-  * FluentD
-  * Kibana
 * **Management**
-
   * cloudflared (tunnel)
-  * cloudflared (proxy-DNS for DoH)
   * Traefik
   * Portainer
-* **Monitoring**
 
-  * Node Exporter
+* **Monitoring**
+  * cAdvisor
+  * Alloy
+  * Loki
   * Prometheus
   * Grafana
-  * cAdvisor
+
 * **Filebrowser**
-
   * Filebrowser
-* **Guacamole**
 
+* **Guacamole**
   * Guacamole
   * Guacd
   * MySQL
 * **Pi-hole**
-
   * Pi-hole
-* **Torrent**
 
+* **Torrent**
   * qBittorrent
 
 * **Stirling**
-
   * Stirling-PDF
 
 ## Environment Variables
 
-### EFK
-
-| Name                | Required? | Allowed Values         | Default Value | Description                                        |
-| ------------------- | --------- | ---------------------- | ------------- | -------------------------------------------------- |
-| HOST                | YES       | a valid domain address |               | Domain address                                     |
-| ES\_PASSWORD        | YES       | string                 |               | Elasticsearch password (see additional info below) |
-| KIBANA\_PASSWORD    | YES       | string                 |               | Kibana password (see additional info below)        |
 
 ### Management
 
@@ -63,9 +48,10 @@ See `ansible` branch for deployment with ansible
 
 ### Monitoring
 
-| Name                | Required? | Allowed Values         | Default Value | Description                |
-| ------------------- | --------- | ---------------------- | ------------- | -------------------------- |
-| HOST                | YES       | a valid domain address |               | Domain address             |
+| Name                | Required? | Allowed Values         | Default Value  | Description                                                                     |
+| ------------------- | --------- | ---------------------- | -------------- | ------------------------------------------------------------------------------- |
+| HOST                | YES       | a valid domain address |                | Domain address                                                                  |
+| DOCKER_DATA_PATH    | No        | an absolute path       |/var/lib/docker | location of docker data (if changed in the /etc/docker/daemon.json config file) |
 
 ### Filebrowser
 
@@ -119,7 +105,7 @@ See `ansible` branch for deployment with ansible
 ### 1. Clone the repository
 
 ```bash
-git clone <repo_url>
+git clone https://github.com/t4nello/homelab.git
 ```
 
 ### 2. Navigate to the management stack directory
@@ -135,7 +121,6 @@ docker network create --opt com.docker.network.bridge.name=management management
 docker network create --opt com.docker.network.bridge.name=monitoring monitoring
 docker network create --opt com.docker.network.bridge.name=applications applications
 docker network create --opt com.docker.network.bridge.name=guacd guacd
-docker network create --opt com.docker.network.bridge.name=logging logging
 ```
 
 ### 4. Create a `.env` file
@@ -159,7 +144,7 @@ htpasswd -Bc -C 6 <path/to/management/compose>/usersfile <username>
 ### 6. Deploy the management stack
 
 ```bash
-docker-compose -f docker-compose-management.yml -p management up -d
+docker-compose -p management up -d
 ```
 
 ### 7. Log in to Portainer
@@ -167,7 +152,7 @@ docker-compose -f docker-compose-management.yml -p management up -d
 Open in browser:
 
 ```
-https://portainer.<your-domain>
+https://portainer.${HOST}
 ```
 
 ### 8. Deploy additional stacks
@@ -229,94 +214,4 @@ According to documentation, directory where logs will be stored have to be owned
 sudo chown -R 1000:1001 {GUACAMOLE_RECORDING_PATH}
 sudo chmod -R 2750 {GUACAMOLE_RECORDING_PATH}
 ```
-
-
-### EFK
-
-To generate passwords for Kibana and FluentD:
-
-1. Connect to the Elasticsearch container:
-
-```bash
-docker exec -it <elastic_container_id> /bin/sh
-```
-
-2. Run:
-
-```bash
-bash bin/elasticsearch-setup-passwords auto
-```
-
-3. Use the generated passwords in your environment variables.
-
-### Pi-hole Setup with Docker
-
-#### 1. Disable systemd-resolved
-
-To allow Pi-hole to listen on port 53:
-
-```bash
-sudo systemctl stop systemd-resolved
-sudo systemctl disable systemd-resolved
-```
-
-#### 2. Temporarily set an external DNS
-
-This ensures the host and Docker can resolve domains (e.g., to download packages):
-
-```bash
-echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
-```
-
-You can also use `8.8.8.8` instead of Cloudflare.
-
-#### 3. Configure Docker to use the correct DNS
-
-Edit or create `/etc/docker/daemon.json`:
-
-```json
-{
-  "dns": ["1.1.1.1"]
-}
-```
-
-#### 4. Restart the Docker engine
-
-```bash
-sudo systemctl restart docker
-```
-
-#### 5. Deploy the Pi-hole stack
-
-Use prepared `docker-compose.yml' in stack-pihole directory. Ports 53 (TCP/UDP) will be mapped to the host, allowing Pi-hole to listen locally.
-
-#### 6. Set the host to use Pi-hole as DNS
-
-After Pi-hole is running, configure your host to point to the local Pi-hole:
-
-```bash
-echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
-```
-Edit or create `/etc/docker/daemon.json`:
-
-```json
-{
-  "dns": [127.0.0.1"]
-}
-```
-#### 7. Restart the Docker engine
-
-```bash
-sudo systemctl restart docker
-```
-
-#### 8. Test the setup
-
-Verify that your host is using Pi-hole:
-
-```bash
-dig @127.0.0.1 google.com
-```
-
-You should receive an `A` record response, confirming Pi-hole is resolving DNS queries correctly.
 

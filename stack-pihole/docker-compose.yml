@@ -15,6 +15,7 @@ services:
       - pihole_etc:/etc/pihole
       - pihole_dnsmasq:/etc/dnsmasq.d
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.pihole.rule=Host(`pihole.${HOST}`)"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
@@ -27,12 +28,6 @@ services:
       - CAP_NET_ADMIN
       - CAP_SYS_TIME 
       - CAP_SYS_NICE 
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: pihole
-          fluentd-async: "true"
 
 networks:
   applications:

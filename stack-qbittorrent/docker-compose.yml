@@ -11,6 +11,7 @@ services:
       - qbitrorent-data:/config
       - ${DOWNLOAD_PATH}:/downloads
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
@@ -18,12 +19,6 @@ services:
     restart: unless-stopped
     networks:
       - applications
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: qbittorrent
-          fluentd-async: "true"
 
 networks:
   applications:

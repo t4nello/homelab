@@ -9,6 +9,7 @@ services:
       - filebrowser-data:/database
       - ./config/config.json:/config.json
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.filebrowser.rule=Host(`fb.${HOST}`)"
       - "traefik.http.services.filebrowser.loadbalancer.server.port=80"
@@ -18,12 +19,6 @@ services:
       - PGID=${GUID:-1000}
     networks:
       - applications
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: fliebrowser
-          fluentd-async: "true"
 
 
 networks:

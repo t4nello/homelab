@@ -10,17 +10,14 @@ services:
       - guacd
     volumes:
     -  ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: guacd
-          fluentd-async: "true"
+    labels:
+      - "logaggregation=yes"
 
   guacamole:
     image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
     container_name: guacamole
     labels:
+      - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.guacamole.rule=Host(`guacamole.${HOST}`)"
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
@@ -44,12 +41,6 @@ services:
       - management
     volumes:
     -  ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: guacamole
-          fluentd-async: "true"
 
   mysql:
     image: mysql:latest
@@ -62,15 +53,11 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./mysql/schema:/docker-entrypoint-initdb.d/
+    labels:
+      - "logaggregation=yes"
     restart: on-failure:5
     networks:
       - guacd
-    logging:
-      driver: fluentd
-      options:
-          fluentd-address: fluent-bit:24224
-          tag: guacamole
-          fluentd-async: "true"
 
 networks:
   management:
