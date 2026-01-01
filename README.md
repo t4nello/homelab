@@ -241,6 +241,28 @@ sudo chown -R 1000:1001 {GUACAMOLE_RECORDING_PATH}
 sudo chmod -R 2750 {GUACAMOLE_RECORDING_PATH}
 ```
 
+### Pi-hole Setup with Docker
+
+#### 1. Disable systemd-resolved
+
+To allow Pi-hole to listen on port 53:
+
+```bash
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+```
+
+#### 2. Set an external DNS
+
+This ensures the host and Docker can resolve domains (e.g., to download packages):
+
+```bash
+echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
+```
+
+You can also use `8.8.8.8` or any other DNS server instead of Cloudflare.
+
+
 ## Post-Deployment & Maintenance
 
 ### Permission Issues
