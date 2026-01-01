@@ -268,6 +268,10 @@ Once all stacks are up, you can access your services at the following addresses.
 | **Pi-hole**     | `https://pihole.${HOST}`      | `admin` / (Check logs for password) |
 | **qBittorrent** | `https://qb.${HOST}`          | `admin` / (Check logs for password) |
 
+```bash
+docker logs [container_name] 2>&1 | grep "password"
+```
+
 ---
 
 ## Network Architecture
