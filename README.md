@@ -115,7 +115,7 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------ |
 | DOWNLOAD\_PATH      | YES       | absolute path          |               | Path where downloaded files will be stored |
 | HOST                | YES       | a valid domain address |               | Domain address                             |
-
+| TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole               |
 
 ### Stirling-PDF
 

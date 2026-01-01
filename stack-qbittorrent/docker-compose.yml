@@ -6,7 +6,7 @@ services:
       - QBT_LEGAL_NOTICE=confirm
       - PGID=${PGID}
       - PUID=${PUID}
-      - TZ=Europe/Warsaw
+      - TZ=${TZ:-Europe/Warsaw}
     volumes:
       - qbitrorent-data:/config
       - ${DOWNLOAD_PATH}:/downloads
