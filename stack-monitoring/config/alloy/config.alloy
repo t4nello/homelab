@@ -56,7 +56,7 @@ prometheus.scrape "traefik" {
 }
 
 prometheus.scrape "cloudflared" {
-    targets    = [{ "__address__" = "cloudflared:60123" }]
+    targets    = [{ "__address__" = "cloudflared-tunnel:60123" }]
     forward_to = [prometheus.remote_write.local_prom.receiver]
 }
 
