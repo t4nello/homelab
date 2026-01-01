@@ -262,6 +262,17 @@ echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
 
 You can also use `8.8.8.8` or any other DNS server instead of Cloudflare.
 
+#### 4. Deploy the Pi-hole stack
+
+Use prepared `docker-compose.yml' in stack-pihole directory. Ports 53 (TCP/UDP) will be mapped to the host, allowing Pi-hole to listen locally.
+
+#### 5. Set the host to use Pi-hole as DNS
+
+After Pi-hole is running, configure your host to point to the local Pi-hole:
+
+```bash
+echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+```
 
 ## Post-Deployment & Maintenance
 
