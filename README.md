@@ -241,7 +241,7 @@ sudo chown -R 1000:1001 {GUACAMOLE_RECORDING_PATH}
 sudo chmod -R 2750 {GUACAMOLE_RECORDING_PATH}
 ```
 
-## 🛠 Post-Deployment & Maintenance
+## Post-Deployment & Maintenance
 
 ### Permission Issues
 If you encounter permission issues with volumes (especially in Monitoring or Guacamole stacks), ensure the directories on your host have the correct ownership. Many containers use UID `1000`.
