@@ -17,7 +17,7 @@ services:
     image: grafana/alloy:latest
     container_name: alloy
     volumes:
-      - ./alloy:/etc/alloy/
+      - ./config/alloy:/etc/alloy/
       - alloy_data:/var/lib/alloy/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
@@ -36,7 +36,7 @@ services:
     image: grafana/loki:latest
     container_name: loki
     volumes:
-      - ./loki:/etc/loki/
+      - ./config/loki:/etc/loki/
       - loki_data:/loki
     labels:
       - "logaggregation=yes"  
@@ -50,7 +50,7 @@ services:
     container_name: prometheus
     volumes:
       - prometheus_data:/prometheus
-      - ./prometheus:/etc/prometheus/
+      - ./config/prometheus:/etc/prometheus/
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
@@ -72,8 +72,8 @@ services:
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
