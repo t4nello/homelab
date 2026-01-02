@@ -45,11 +45,6 @@ prometheus.scrape "node" {
     forward_to = [prometheus.remote_write.local_prom.receiver]
 }
 
-prometheus.scrape "cadvisor" {
-    targets    = [{ "__address__" = "cadvisor:8080" }]
-    forward_to = [prometheus.remote_write.local_prom.receiver]
-}
-
 prometheus.scrape "traefik" {
     targets    = [{ "__address__" = "traefik:8082" }]
     forward_to = [prometheus.remote_write.local_prom.receiver]
@@ -64,4 +59,29 @@ prometheus.remote_write "local_prom" {
     endpoint {
         url = "http://prometheus:9090/api/v1/write"
     }
+}
+
+prometheus.exporter.cadvisor "docker" {
+  docker_host       = "unix:///var/run/docker.sock"
+  docker_only       = true
+}
+
+prometheus.scrape "cadvisor" {
+  targets    = prometheus.exporter.cadvisor.docker.targets
+  forward_to = [prometheus.relabel.cadvisor.receiver]
+}
+
+prometheus.relabel "cadvisor" {
+  forward_to = [prometheus.remote_write.local_prom.receiver]
+
+  rule {
+    regex   = "^(container_label_com_docker_compose_.+|id|container_label_maintainer|container_label_org_opencontainers_.+)"
+    action  = "labeldrop"
+  }
+
+  rule {
+    source_labels = ["__name__"]
+    regex         = "^(container_cpu_usage_seconds_total|container_fs_inodes_free|container_fs_inodes_total|container_fs_limit_bytes|container_fs_usage_bytes|container_last_seen|container_memory_usage_bytes|container_network_receive_bytes_total|container_network_tcp_usage_total|container_network_transmit_bytes_total|container_spec_memory_reservation_limit_bytes|machine_memory_bytes|machine_scrape_error)$"
+    action        = "keep"
+  }
 }
