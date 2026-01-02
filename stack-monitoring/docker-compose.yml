@@ -9,7 +9,6 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
-      - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
     labels:
       - "logaggregation=yes"
     command: [
