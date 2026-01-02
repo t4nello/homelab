@@ -1,4 +1,18 @@
 services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - ${DOCKER_DATA_PATH:-/var/lib/docker}:/var/lib/docker:ro 
+    labels:
+      - "logaggregation=yes"
+    restart: unless-stopped
+    networks:
+      - monitoring
+
   alloy:
     image: grafana/alloy:latest
     container_name: alloy
@@ -6,9 +20,7 @@ services:
       - ${CONFIG_PATH:-.}/config/alloy:/etc/alloy/
       - alloy_data:/var/lib/alloy/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
+      - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
     labels:
       - "logaggregation=yes"
     command: [
