@@ -17,7 +17,7 @@ services:
     image: grafana/alloy:latest
     container_name: alloy
     volumes:
-      - ${CONFIG_PATH:-.}/config/alloy:/etc/alloy/
+      - ${CONFIG_PATH:-.}/config/alloy:/
       - alloy_data:/var/lib/alloy/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
