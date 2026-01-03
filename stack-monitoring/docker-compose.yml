@@ -26,10 +26,16 @@ services:
       - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
     labels:
       - "logaggregation=yes"
+      - "traefik.enable=true"
+      - "traefik.http.routers.alloy.rule=Host(`alloy.${HOST}`)"
+      - "traefik.http.services.alloy.loadbalancer.server.port=12345"
+      - "traefik.docker.network=monitoring"
+      - "traefik.http.routers.alloy.middlewares=simpleauth"
     command: [
       "run", 
       "--storage.path=/var/lib/alloy/data",
-      "/etc/alloy/config.alloy"
+      "/etc/alloy/config.alloy",
+      "--server.http.listen-addr=0.0.0.0:12345"
     ]
     networks:
       - monitoring
