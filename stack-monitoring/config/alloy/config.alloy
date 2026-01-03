@@ -38,9 +38,16 @@ loki.write "local_loki" {
 }
 
 prometheus.exporter.unix "node" {
+
     procfs_path = "/host/proc"
     sysfs_path  = "/host/sys"
     rootfs_path = "/rootfs"
+
+    filesystem {
+        fs_types_exclude = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|tmpfs)$"
+        mount_points_exclude = "^/(dev|proc|run|sys|var/lib/docker/.+)($|/)"
+    }
+
     hwmon {
         chip_exclude = "hwmon4"
     }
