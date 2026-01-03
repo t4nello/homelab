@@ -40,7 +40,7 @@ loki.write "local_loki" {
 prometheus.exporter.unix "node" {
     procfs_path = "/host/proc"
     sysfs_path  = "/host/sys"
-    rootfs_path = "/host/rootfs"
+    rootfs_path = "/rootfs"
     hwmon {
         chip_exclude = "hwmon4"
     }
