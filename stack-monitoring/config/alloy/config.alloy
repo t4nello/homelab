@@ -1,4 +1,3 @@
-
 discovery.docker "logs_integrations_docker" {
     host = "unix:///var/run/docker.sock"
     refresh_interval = "5s"
@@ -23,7 +22,7 @@ discovery.relabel "logs_integrations_docker" {
             target_label = "stream"
         }
 }
-    
+
 loki.source.docker "logs_integrations_docker" {
     host = "unix:///var/run/docker.sock"
     targets = discovery.docker.logs_integrations_docker.targets
@@ -38,9 +37,14 @@ loki.write "local_loki" {
     }
 }
 
-prometheus.exporter.unix "node" {}
+prometheus.exporter.unix "node" {
+    hwmon {
+        chip_exclude = "hwmon4"
+    }
+}
 
 prometheus.scrape "node" {
+    scrape_interval = "15s"
     targets    = prometheus.exporter.unix.node.targets
     forward_to = [prometheus.remote_write.local_prom.receiver]
 }
