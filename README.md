@@ -156,8 +156,9 @@ Example:
 
 ```env
 HOST=example.com
-TRAEFIK_TLS=true
-TRAEFIK_ENTRYPOINT=websecure
+TUNNEL_TOKEN=abc-123-def-456
+PORTAINER_LICENSE_KEY=abc-123-def-456
+PORTAINER_EDITION=ee
 ```
 
 ### 5. Install apache2-utils to generate password file for Traefik/Prometheus
@@ -314,7 +315,7 @@ Understanding how traffic flows through this homelab setup:
 
 
 1. **Cloudflared Tunnel** creates a secure entry point without opening ports.
-2. **Traefik** acts as a Reverse Proxy, handling SSL and routing traffic to specific containers based on the hostname.
+2. **Traefik** acts as a Reverse Proxy, routing traffic to specific containers based on the hostname.
 3. **Isolated Networks** (`management`, `monitoring`, `applications`) ensure that containers only communicate with what they need to.
 
 ---
