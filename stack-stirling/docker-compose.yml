@@ -26,5 +26,5 @@ volumes:
     name: stirling_data
 
 networks:
-  torrent:
+  applications:
     external: true
