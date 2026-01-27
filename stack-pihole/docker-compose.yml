@@ -1,33 +1,38 @@
 services:
   pihole:
-    image: pihole/pihole:latest
     container_name: pihole
+    image: pihole/pihole:latest
     hostname: pihole
-    restart: unless-stopped
     networks:
       - applications
-    ports:
-      - "53:53/tcp" 
-      - "53:53/udp"
-    environment:
-      TZ: "${TZ:-Europe/Warsaw}"
-    volumes:
-      - pihole_etc:/etc/pihole
-      - pihole_dnsmasq:/etc/dnsmasq.d
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.pihole.rule=Host(`pihole.${HOST}`)"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
       - "traefik.docker.network=applications"
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    environment:
+      TZ: "${TZ:-Europe/Warsaw}"
+    volumes:
+      - pihole_etc:/etc/pihole
+      - pihole_dnsmasq:/etc/dnsmasq.d
     cap_add:
-      - NET_ADMIN 
+      - NET_ADMIN
       - CHOWN
       - NET_BIND_SERVICE
       - NET_RAW
-      - CAP_NET_ADMIN
-      - CAP_SYS_TIME 
-      - CAP_SYS_NICE 
+      - SYS_TIME
+      - SYS_NICE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pihole", "status", "web"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   applications:

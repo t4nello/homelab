@@ -1,29 +1,35 @@
 services:
   qbittorrent:
-    image: qbittorrentofficial/qbittorrent-nox:latest
     container_name: qbittorrent
-    environment:
-      - QBT_LEGAL_NOTICE=confirm
-      - PGID=${PGID}
-      - PUID=${PUID}
-      - TZ=${TZ:-Europe/Warsaw}
-    volumes:
-      - qbitrorent-data:/config
-      - ${DOWNLOAD_PATH}:/downloads
+    image: qbittorrentofficial/qbittorrent-nox:latest
+    networks:
+      - applications
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.qbittorrent.rule=Host(`qb.${HOST}`)"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
       - "traefik.docker.network=applications"
+    environment:
+      - QBT_LEGAL_NOTICE=confirm
+      - PGID=${PGID}
+      - PUID=${PUID}
+      - TZ=${TZ:-Europe/Warsaw}
+      - WEBUI_PORT=8080
+    volumes:
+      - qbitrorent-data:/config
+      - ${DOWNLOAD_PATH}:/downloads
     restart: unless-stopped
-    networks:
-      - applications
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/ || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   applications:
     external: true
-
 
 volumes:
   qbitrorent-data: 

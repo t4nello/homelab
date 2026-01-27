@@ -1,21 +1,52 @@
 services:
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    networks:
+      - guacd
+    labels:
+      - "logaggregation=yes"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=guacamole_db
+      - MYSQL_USER=guacamole
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ${CONFIG_PATH:-.}/mysql/schema:/docker-entrypoint-initdb.d/
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD | grep 'mysqld is alive' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   guacd:
-    image: guacamole/guacd:${GUACAMOLE_VERSION:-latest}
     container_name: guacd
+    image: guacamole/guacd:${GUACAMOLE_VERSION:-latest}
+    networks:
+      - guacd
+    labels:
+      - "logaggregation=yes"
     environment:
       - LOG_LEVEL=info
       - RECORDING_SEARCH_PATH=/recordings
-    restart: on-failure:5
-    networks:
-      - guacd
     volumes:
-    -  ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
-    labels:
-      - "logaggregation=yes"
+      - ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "4822"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   guacamole:
-    image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
     container_name: guacamole
+    image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
+    networks:
+      - guacd
+      - management
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
@@ -25,8 +56,8 @@ services:
     environment:
       - LOG_LEVEL=info
       - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
-      - MYSQL_HOSTNAME=mysql
       - GUACD_PORT=${GUACD_PORT:-4822}
+      - MYSQL_HOSTNAME=mysql
       - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_DATABASE=guacamole_db
       - MYSQL_USER=guacamole
@@ -35,29 +66,20 @@ services:
       - RECORDING_ENABLED=true
       - RECORDING_SEARCH_PATH=/recordings
       - REMOTE_IP_VALVE_ENABLED=true
-    restart: on-failure:5
-    networks:
-      - guacd
-      - management
     volumes:
-    -  ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
-
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=guacamole_db
-      - MYSQL_USER=guacamole
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ${CONFIG_PATH:-.}/mysql/schema:/docker-entrypoint-initdb.d/
-    labels:
-      - "logaggregation=yes"
-    restart: on-failure:5
-    networks:
-      - guacd
+      - ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      guacd:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/guacamole/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
 
 networks:
   management:

@@ -1,74 +1,87 @@
 services:
-  cloudflared-tunnel:
-    image: cloudflare/cloudflared
-    container_name: cloudflared-tunnel
+  traefik:
+    container_name: traefik
+    image: traefik:v3.6
+    networks:
+      - management
+      - monitoring
+      - applications
+    labels:
+      - "logaggregation=yes"
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=simpleauth"
+      - "traefik.http.middlewares.simpleauth.basicauth.usersfile=/usersfile"
+    command:
+      - "--api=true"
+      - "--ping=true"
+      - "--log.level=debug"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.filename=/etc/traefik/definition.yml"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--metrics.prometheus=true"
+      - "--accesslog=true"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./usersfile:/usersfile
     restart: unless-stopped
-    command: tunnel run
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
+
+  cloudflared-tunnel:
+    container_name: cloudflared-tunnel
+    image: cloudflare/cloudflared
+    networks:
+      - management
+      - monitoring
     labels:
       - "logaggregation=yes"
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
       - TUNNEL_LOGLEVEL=info
       - TUNNEL_METRICS=0.0.0.0:60123
+    command: tunnel run
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    networks:
-      - management
-      - monitoring
-
-  traefik:
-    image: traefik:v3.6
-    container_name: traefik
-    command:
-      - "--api=true"
-      - "--log.level=debug"
-      - "--providers.docker.exposedByDefault=false"
-      - "--accesslog=true"
-      - "--providers.file.filename=/etc/traefik/definition.yml"
-      - "--providers.file.watch=true"
-      - "--providers.docker=true"           
-      - "--entrypoints.web.address=:80"
-      - "--metrics.prometheus=true"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - ./usersfile:/usersfile
-    labels:
-      - "logaggregation=yes"
-      - "traefik.enable=true" 
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${HOST}`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.middlewares.simpleauth.basicauth.usersfile=./usersfile"
-      - "traefik.http.routers.dashboard.middlewares=simpleauth"
-      - "traefik.http.middlewares.simpleauth.basicauth.removeheader=false"
-    restart: unless-stopped
-    networks:
-      - management
-      - monitoring
-      - applications
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
 
   portainer:
-    image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
     container_name: portainer
-    command: 
-      - --host=unix:///var/run/docker.sock 
-      - --license-key=${PORTAINER_LICENCE_KEY}  
-    environment:
-      - TRUSTED_ORIGINS=portainer.${HOST}
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock" 
-      - "portainer_data:/data"
-    labels:
-      - "logaggregation=yes"
-      - "traefik.enable=true" 
-      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"   
-      - "traefik.docker.network=management"
-    restart: unless-stopped
+    image: portainer/portainer-${PORTAINER_EDITION:-ce}:latest
     networks:
       - management
+    labels:
+      - "logaggregation=yes"
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${HOST}`)"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.docker.network=management"
+    environment:
+      - TRUSTED_ORIGINS=portainer.${HOST}
+    command: 
+      - --host=unix:///var/run/docker.sock 
+      - --license-key=${PORTAINER_LICENCE_KEY}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "portainer_data:/data"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:9000/api/system/status || exit 1"]
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
 
 networks:
   management:
@@ -79,5 +92,5 @@ networks:
     external: true
 
 volumes:
-   portainer_data:
+  portainer_data:
     name: portainer_data

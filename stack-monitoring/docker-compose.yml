@@ -1,30 +1,29 @@
 services:
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      - monitoring
+    labels:
+      - "logaggregation=yes"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
-      - ${DOCKER_DATA_PATH:-/var/lib/docker}:/var/lib/docker:ro 
-    labels:
-      - "logaggregation=yes"
+      - ${DOCKER_DATA_PATH:-/var/lib/docker}:/var/lib/docker:ro
     restart: unless-stopped
-    networks:
-      - monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
 
   alloy:
-    image: grafana/alloy:latest
     container_name: alloy
-    volumes:
-      - /etc/hostname:/host/etc/hostname:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-      - ${CONFIG_PATH:-.}/config/alloy:/etc/alloy
-      - alloy_data:/var/lib/alloy/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
+    image: grafana/alloy:latest
+    networks:
+      - monitoring
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
@@ -38,29 +37,47 @@ services:
       "/etc/alloy/config.alloy",
       "--server.http.listen-addr=0.0.0.0:12345"
     ]
-    networks:
-      - monitoring
+    volumes:
+      - /etc/hostname:/host/etc/hostname:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - ${CONFIG_PATH:-.}/config/alloy:/etc/alloy
+      - alloy_data:/var/lib/alloy/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:12345/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   loki:
-    image: grafana/loki:latest
     container_name: loki
+    image: grafana/loki:latest
+    networks:
+      - monitoring
+    labels:
+      - "logaggregation=yes"
+    command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ${CONFIG_PATH:-.}/config/loki:/etc/loki/
       - loki_data:/loki
-    labels:
-      - "logaggregation=yes"  
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - monitoring
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
 
   prometheus:
-    image: prom/prometheus:latest
     container_name: prometheus
-    volumes:
-      - prometheus_data:/prometheus
-      - ${CONFIG_PATH:-.}/config/prometheus:/etc/prometheus/
+    image: prom/prometheus:latest
+    networks:
+      - monitoring
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
@@ -74,40 +91,51 @@ services:
       - '--web.enable-lifecycle'
       - '--web.enable-admin-api'
       - '--web.enable-remote-write-receiver'
-    networks:
-      - monitoring
+    volumes:
+      - prometheus_data:/prometheus
+      - ${CONFIG_PATH:-.}/config/prometheus:/etc/prometheus/
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
 
   grafana:
-    image: grafana/grafana:latest
     container_name: grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ${CONFIG_PATH:-.}/config/grafana/dashboards:/var/lib/grafana/dashboards
-      - ${CONFIG_PATH:-.}/config/grafana/provisioning:/etc/grafana/provisioning
+    image: grafana/grafana:latest
+    networks:
+      - monitoring
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`grafana.${HOST}`)"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
       - "traefik.docker.network=monitoring"
-    depends_on:
-      - prometheus
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ${CONFIG_PATH:-.}/config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ${CONFIG_PATH:-.}/config/grafana/provisioning:/etc/grafana/provisioning
     restart: unless-stopped
-    networks:
-      - monitoring
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
 
 networks:
   monitoring:
     external: true
 
 volumes:
-  prometheus_data: 
+  prometheus_data:
     name: prometheus_data
   grafana_data:
     name: grafana_data

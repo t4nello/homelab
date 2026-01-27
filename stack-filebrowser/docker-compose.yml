@@ -17,9 +17,15 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${GUID:-1000}
+    healthcheck:
+      test: ["CMD", "/filebrowser", "healthcheck"]
+      interval: 10s
+      timeout: 15s
+      retries: 30
+      start_period: 40s
+    restart: unless-stopped
     networks:
       - applications
-
 
 networks:
   applications:
