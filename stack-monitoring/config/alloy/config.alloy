@@ -12,7 +12,7 @@ discovery.relabel "logs_integrations_docker" {
 
   rule {
     target_label = "instance"
-    replacement  = trimspace(local.file.host_hostname.content)
+    replacement  = trim_space(local.file.host_hostname.content)
   }
 
   rule {
