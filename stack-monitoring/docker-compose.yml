@@ -24,6 +24,7 @@ services:
       - alloy_data:/var/lib/alloy/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DOCKER_DATA_PATH:-/var/lib/docker}/containers:/var/lib/docker/containers:ro
+      - NODE_NAME=${HOSTNAME}
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"

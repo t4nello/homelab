@@ -53,10 +53,26 @@ prometheus.exporter.unix "node" {
     }
 }
 
+prometheus.relabel "node_fix" {
+    forward_to = [prometheus.remote_write.local_prom.receiver]
+
+    rule {
+        target_label = "instance"
+        replacement  = sys.env("NODE_NAME")
+    }
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "node_uname_info"
+        target_label  = "nodename"
+        replacement   = sys.env("NODE_NAME")
+    }
+}
+
 prometheus.scrape "node" {
     scrape_interval = "15s"
     targets    = prometheus.exporter.unix.node.targets
-    forward_to = [prometheus.remote_write.local_prom.receiver]
+    forward_to      = [prometheus.relabel.node_fix.receiver]
 }
 
 prometheus.scrape "cadvisor" {
