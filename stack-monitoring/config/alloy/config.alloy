@@ -61,14 +61,14 @@ prometheus.relabel "node_fix" {
 
   rule {
     target_label = "instance"
-    replacement  = str.trim_space(local.file.host_hostname.content)
+    replacement  = trim_space(local.file.host_hostname.content)
   }
 
   rule {
     source_labels = ["__name__"]
     regex         = "node_uname_info"
     target_label  = "nodename"
-    replacement   = str.trim_space(local.file.host_hostname.content)
+    replacement   = trim_space(local.file.host_hostname.content)
   }
 }
 
