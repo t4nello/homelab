@@ -260,6 +260,29 @@ You can also use `8.8.8.8` or any other DNS server instead of Cloudflare.
 
 Use prepared `docker-compose.yml' in stack-pihole directory. Ports 53 (TCP/UDP) will be mapped to the host, allowing AdGuard to listen locally.
 
+#### 5. Important: AdGuard Home installer endpoints
+
+During the first launch, AdGuard Home does not run its main web interface on port 80.Instead, it starts a temporary setup wizard on port 3000 and redirects all traffic to:
+
+/install.html
+
+In this installation mode, AdGuard exposes two critical endpoint ranges:
+
+| Endpoint            | Purpose?                             | Port  |
+| ------------------- | -------------------------------------| ----- |
+| /install/*          | Installer web UI (HTML)              | 3000  |         
+| /control/install/*  | Installer API (e.g., get_addresses)  | 3000  |
+
+After the installation is completed:
+
+AdGuard stops using port 3000
+
+The main UI becomes available on port 80. **So dont change ports in the setup wizard!** 
+
+The installer endpoints (/install/* and /control/install/*) are removed
+
+The setup routers can be safely deleted from your Traefik configuration
+
 #### 5. Set the host to use AdGuard as DNS
 
 After AdGuard is running, configure your host to point to the local AdGuard:
