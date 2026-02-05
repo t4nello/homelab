@@ -17,6 +17,7 @@ services:
       - "53:53/udp"
     volumes:
       - adguard_config:/opt/adguardhome/conf
+      - ${CONFIG_PATH:-.}/config/AdGuardHome.yaml:/opt/adguardhome/conf/AdGuardHome.yaml
       - adguard_work:/opt/adguardhome/work
     restart: unless-stopped
     #healthcheck:
