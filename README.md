@@ -25,8 +25,8 @@ See `ansible` branch for deployment with ansible
   * Guacamole
   * Guacd
   * MySQL
-* **Pi-hole**
-  * Pi-hole
+* **AdGuard**
+  * AdGuard
 
 * **Torrent**
   * qBittorrent
@@ -101,13 +101,6 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | GUACAMOLE_VERSION        | NO                                      | a valid version           |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
 | GUACAMOLE_RECORDING_PATH | YES                                     |absolute path to directory |               | Path where session recordings and typescript will be saved                                           |
 | CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path          |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/) |
-
-### Pi-hole
-
-| Name                | Required? | Allowed Values         | Default Value | Description                        |
-| ------------------- | --------- | ---------------------- | ------------- | ---------------------------------- |
-| TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole               |
-| HOST                | YES       | a valid domain address |               | Domain address                     |
 
 ### qBittorrent
 
@@ -242,11 +235,11 @@ sudo chown -R 1000:1001 {GUACAMOLE_RECORDING_PATH}
 sudo chmod -R 2750 {GUACAMOLE_RECORDING_PATH}
 ```
 
-### Pi-hole Setup with Docker
+### AdGuardSetup with Docker
 
 #### 1. Disable systemd-resolved
 
-To allow Pi-hole to listen on port 53:
+To allow AdGuard to listen on port 53:
 
 ```bash
 sudo systemctl stop systemd-resolved
@@ -263,13 +256,13 @@ echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
 
 You can also use `8.8.8.8` or any other DNS server instead of Cloudflare.
 
-#### 4. Deploy the Pi-hole stack
+#### 4. Deploy the AdGuard stack
 
-Use prepared `docker-compose.yml' in stack-pihole directory. Ports 53 (TCP/UDP) will be mapped to the host, allowing Pi-hole to listen locally.
+Use prepared `docker-compose.yml' in stack-pihole directory. Ports 53 (TCP/UDP) will be mapped to the host, allowing AdGuard to listen locally.
 
-#### 5. Set the host to use Pi-hole as DNS
+#### 5. Set the host to use AdGuard as DNS
 
-After Pi-hole is running, configure your host to point to the local Pi-hole:
+After AdGuard is running, configure your host to point to the local AdGuard:
 
 ```bash
 echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
@@ -283,7 +276,6 @@ If you encounter permission issues with volumes (especially in Monitoring or Gua
 ### Database Backups
 It is highly recommended to regularly back up the following:
 * **Guacamole:** MySQL database volume.
-* **Pi-hole:** `/etc/pihole` and `/etc/dnsmasq.d`.
 * **Traefik:** `acme.json` (if using Let's Encrypt instead of Cloudflare Tunnel).
 
 ##  Access to Services
@@ -299,7 +291,7 @@ Once all stacks are up, you can access your services at the following addresses.
 | **Prometheus**  | `https://prometheus.${HOST}`  | Protected by `htpasswd`             |
 | **Filebrowser** | `https://filebrowser.${HOST}` | `admin` / `admin`                   |
 | **Guacamole**   | `https://guacamole.${HOST}`   | `guacadmin` / `guacadmin`           |
-| **Pi-hole**     | `https://pihole.${HOST}`      | `admin` / (Check logs for password) |
+| **AdGuard**     | `https://adguard.${HOST}`      | `admin` / (Check logs for password) |
 | **qBittorrent** | `https://qb.${HOST}`          | `admin` / (Check logs for password) |
 
 ```bash
