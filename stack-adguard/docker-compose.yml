@@ -1,7 +1,7 @@
 services:
   adguard:
     container_name: adguard
-    image: pihole/pihole:latest
+    image: adguard/adguardhome:latest
     hostname: adguard
     networks:
       - applications
