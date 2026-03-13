@@ -85,6 +85,8 @@ services:
     container_name: watchtower
     networks:
       - management
+    labels:
+      - "logaggregation=yes"
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
