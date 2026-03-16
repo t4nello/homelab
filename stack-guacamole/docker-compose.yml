@@ -82,7 +82,7 @@ services:
       start_period: 45s
 
 networks:
-  management:
+  applications:
     external: true
   guacd:
     external: true
