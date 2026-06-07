@@ -18,13 +18,16 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.bookstack.rule=Host(`wiki.${HOST}`)"
       - "traefik.http.services.bookstack.loadbalancer.server.port=80"
-      - "traefik.docker.network=guacd"
+      - "traefik.docker.network=applications"
     restart: unless-stopped
     networks:
       - guacd
+      - applications
       
 networks:
   guacd:
+    external: true
+  applications:
     external: true
 
 volumes:
