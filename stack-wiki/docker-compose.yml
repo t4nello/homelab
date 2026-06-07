@@ -1,0 +1,32 @@
+services:
+  bookstack:
+    image: lscr.io/linuxserver/bookstack:latest
+    container_name: bookstack
+    environment:
+      - TZ=${TZ:-Europe/Warsaw}
+      - APP_KEY=${APP_KEY}
+      - APP_URL=${APP_URL}
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USERNAME=${DB_USERNAME:-bookstack_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE:-bookstackapp}
+    volumes:
+      - bookstack-data:/config
+    labels:
+      - "logaggregation=yes"
+      - "traefik.enable=true"
+      - "traefik.http.routers.bookstack.rule=Host(`wiki.${HOST}`)"
+      - "traefik.http.services.bookstack.loadbalancer.server.port=6875"
+      - "traefik.docker.network=guacd"
+    restart: unless-stopped
+    networks:
+      - guacd
+      
+networks:
+  guacd:
+    external: true
+
+volumes:
+  bookstack-data: 
+    name: bookstack-data
