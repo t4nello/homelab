@@ -1,27 +1,4 @@
 services:
-  mysql:
-    container_name: mysql
-    image: mysql:latest
-    networks:
-      - guacd
-    labels:
-      - "logaggregation=yes"
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=guacamole_db
-      - MYSQL_USER=guacamole
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ${CONFIG_PATH:-.}/mysql/schema:/docker-entrypoint-initdb.d/
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD | grep 'mysqld is alive' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
   guacd:
     container_name: guacd
     image: guacamole/guacd:${GUACAMOLE_VERSION:-latest}
@@ -60,7 +37,7 @@ services:
       - MYSQL_HOSTNAME=mysql
       - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_DATABASE=guacamole_db
-      - MYSQL_USER=guacamole
+      - MYSQL_USER=sqadmin
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
       - RECORDING_ENABLED=true
@@ -84,9 +61,7 @@ services:
 networks:
   applications:
     external: true
-  guacd:
+  database:        
     external: true
-
-volumes:
-  mysql-data: 
-    name: mysql-data
+  guacd:            
+    external: true

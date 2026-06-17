@@ -17,6 +17,8 @@
 -- under the License.
 --
 
+USE guacamole_db;
+
 --
 -- Table of connection groups. Each connection group has a name.
 --

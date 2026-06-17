@@ -5,12 +5,12 @@ services:
     environment:
       - TZ=${TZ:-Europe/Warsaw}
       - APP_KEY=${APP_KEY}
-      - APP_URL=${APP_URL}
+      - APP_URL=https://wiki.${HOST}
       - DB_HOST=${DB_HOST:-mysql}
       - DB_PORT=${DB_PORT:-3306}
-      - DB_USERNAME=${DB_USERNAME:-bookstack_user}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE=${DB_DATABASE:-bookstackapp}
+      - DB_USER=sqadmin           
+      - DB_PASS=${DB_PASSWORD}  
+      - DB_DATABASE=bookstack_db 
     volumes:
       - bookstack-data:/config
     labels:
@@ -21,11 +21,11 @@ services:
       - "traefik.docker.network=applications"
     restart: unless-stopped
     networks:
-      - guacd
+      - database
       - applications
       
 networks:
-  guacd:
+  database:
     external: true
   applications:
     external: true

@@ -24,7 +24,10 @@ See `ansible` branch for deployment with ansible
 * **Guacamole**
   * Guacamole
   * Guacd
+
+* **Database**
   * MySQL
+
 * **AdGuard**
   * AdGuard
 
@@ -33,6 +36,9 @@ See `ansible` branch for deployment with ansible
 
 * **Stirling**
   * Stirling-PDF
+
+* **Wiki**
+  * Bookstack
 
 
 
@@ -57,9 +63,15 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 
 ---
 
-> [!TIP]
+[!TIP]
 > Using the `${CONFIG_PATH:-.}` syntax ensures that if you run these stacks via CLI (`docker compose up`), they will default to the current directory (`.`), maintaining compatibility across different environments.
 ## Environment Variables
+
+[!IMPORTANT]
+> **Environment Variables Alignment:**
+> While the order of lines in your `.env` file does not matter, the **variable names must strictly match** across your compose stacks. 
+> 
+> For instance, ensure that the password defined for MySQL (`MYSQL_PASSWORD`) is identical to the one provided to BookStack (`DB_PASSWORD`) if you are using a shared `sqadmin` account. Double-check your values to avoid database connection errors (`Access denied for user`).
 
 ### Management
 
@@ -85,22 +97,28 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | PUID                | NO                                      | valid user ID              | 1000          | User ID                                                                                              |
 | GUID                | NO                                      | valid group ID             | 1000          | Group ID                                                                                             |
 | BROWSING\_PATH      | YES                                     | absolute path to directory |               | Path to directory                                                                                    |
-| CONFIG_PATH         | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path           |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/) |
+| CONFIG_PATH         | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path           |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/)   |
 | HOST                | YES                                     | a valid domain address     |               | Domain address                                                                                       |
+
+### Database
+
+| Name                | Required? | Allowed Values         | Default Value | Description                                |
+| ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------ |
+| MYSQL\_ROOT\_PASSWORD    | YES                                     | string                    |               | MySQL password for root                                                                              |
+| MYSQL\_PASSWORD          | YES                                     | string                    |               | MySQL password for `sqadmin` user                                                                    |
+
 
 ### Guacamole
 
-| Name                     | Required?                               | Allowed Values            | Default Value | Description                                                                                          |
-| ---------------------    | ---------                               | ------------------------- | ------------- | -----------------------------------------------------------                                          |
-| GUACD\_PORT              | NO                                      | 0-65535                   | 4822          | Guacd port                                                                                           |
-| MYSQL\_PORT              | NO                                      | 0-65535                   | 3306          | MySQL database port                                                                                  |
-| MYSQL\_USER              | NO                                      | string                    | admin         | MySQL username                                                                                       |
-| MYSQL\_PASSWORD          | YES                                     | string                    |               | MySQL password for user                                                                              |
-| MYSQL\_ROOT\_PASSWORD    | YES                                     | string                    |               | MySQL password for root                                                                              |
-| HOST                     | YES                                     | a valid domain address    |               | Domain address                                                                                       |
-| GUACAMOLE_VERSION        | NO                                      | a valid version           |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
-| GUACAMOLE_RECORDING_PATH | YES                                     |absolute path to directory |               | Path where session recordings and typescript will be saved                                           |
-| CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path          |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/) |
+| Name                     | Required?                               | Allowed Values             | Default Value | Description                                                                                          |
+| ---------------------    | ---------                               | -------------------------  | ------------- | -----------------------------------------------------------                                          |
+| GUACD\_PORT              | NO                                      | 0-65535                    | 4822          | Guacd port                                                                                           |
+| MYSQL\_PORT              | NO                                      | 0-65535                    | 3306          | MySQL database port                                                                                  |
+| MYSQL\_PASSWORD          | YES                                     | string                     |               | MySQL password for user                                                                              |
+| HOST                     | YES                                     | a valid domain address     |               | Domain address                                                                                       |
+| GUACAMOLE_VERSION        | NO                                      | a valid version            |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
+| GUACAMOLE_RECORDING_PATH | YES                                     | absolute path to directory |               | Path where session recordings and typescript will be saved                                           |
+| CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path           |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/) |
 
 ### qBittorrent
 
@@ -108,7 +126,7 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------ |
 | DOWNLOAD\_PATH      | YES       | absolute path          |               | Path where downloaded files will be stored |
 | HOST                | YES       | a valid domain address |               | Domain address                             |
-| TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole               |
+| TZ                  | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for Pi-hole                       |
 
 ### Stirling-PDF
 
@@ -116,6 +134,17 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | ------------------- | --------- | ---------------------- | ------------- | ------------------------------------------------- |
 | LOCALE              | No        | locale code            | pl-PL         | Locale used for language and regional formatting  |
 | HOST                | YES       | a valid domain address |               | Domain address                                    |
+
+### BookStack
+
+| Name         | Required? | Allowed Values         | Default Value | Description                                      |
+| ------------ | --------- | ---------------------- | ------------- | ------------------------------------------------ |
+| APP_KEY      | YES       | String (32 chars)      |               | Encryption key for sessions and user data        |
+| HOST         | YES       | A valid domain address |               | Domain address                                   |
+| TZ           | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for the application                     |
+| DB_HOST      | NO        | String                 | mysql         | Hostname of the MySQL container                  |
+| DB_PORT      | NO        | 0-65535                | 3306          | MySQL database port                              |
+| DB_PASS      | YES       | String                 |               | Password for the `sqadmin` user                  |
 
 ---
 
@@ -140,6 +169,7 @@ docker network create --opt com.docker.network.bridge.name=management management
 docker network create --opt com.docker.network.bridge.name=monitoring monitoring
 docker network create --opt com.docker.network.bridge.name=applications applications
 docker network create --opt com.docker.network.bridge.name=guacd guacd
+docker network create --opt com.docker.network.bridge.name=database database
 ```
 
 ### 4. Create a `.env` file
@@ -283,12 +313,23 @@ The installer endpoints (/install/* and /control/install/*) are removed
 
 The setup routers can be safely deleted from your Traefik configuration
 
-#### 5. Set the host to use AdGuard as DNS
+#### 6. Set the host to use AdGuard as DNS
 
 After AdGuard is running, configure your host to point to the local AdGuard:
 
 ```bash
 echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
+```
+
+### BookStack
+#### Database Initialization & Shared Instance
+
+BookStack configuration is integrated with the Guacamole MySQL database container to optimize resources. 
+
+* **Automatic Schema Migration:** You do not need to provide any SQL schema for BookStack. The application handles migrations automatically upon first boot, provided that an empty database (`bookstack_db`) has been pre-created via the initialization script (`001-create-databases.sql`).
+* **Generating APP_KEY:** Before deploying, make sure to generate a secure 32-character application key and place it in your `.env` file:
+```bash
+    docker run -it --rm --entrypoint /bin/bash lscr.io/linuxserver/bookstack:latest appkey"
 ```
 
 ## Post-Deployment & Maintenance
@@ -306,17 +347,19 @@ It is highly recommended to regularly back up the following:
 Once all stacks are up, you can access your services at the following addresses. 
 *Note: Replace `${HOST}` with your actual domain (e.g., example.com).*
 
-| Service         | URL                           | Default Credentials                 |
-| :---            | :---                          | :---                                |
-| **Portainer**   | `https://portainer.${HOST}`   | `admin` / (Set at 1st login)        |
-| **Traefik**     | `https://traefik.${HOST}`     | Protected by `htpasswd`             |
-| **Grafana**     | `https://grafana.${HOST}`     | `admin` / `admin`                   |
-| **Prometheus**  | `https://prometheus.${HOST}`  | Protected by `htpasswd`             |
-| **Filebrowser** | `https://filebrowser.${HOST}` | `admin` / `admin`                   |
-| **Guacamole**   | `https://guacamole.${HOST}`   | `guacadmin` / `guacadmin`           |
-| **AdGuard**     | `https://adguard.${HOST}`      | `admin` / (Check logs for password) |
-| **qBittorrent** | `https://qb.${HOST}`          | `admin` / (Check logs for password) |
+| Service              | URL                           | Default Credentials                    |
+| :---                 | :---                          | :---                                   |
+| **Portainer**        | `https://portainer.${HOST}`   | `admin` / (Set at 1st login)           |
+| **Traefik**          | `https://traefik.${HOST}`     | Protected by `htpasswd`                |
+| **Grafana**          | `https://grafana.${HOST}`     | `admin` / `admin`                      |
+| **Prometheus**       | `https://prometheus.${HOST}`  | Protected by `htpasswd`                |
+| **Filebrowser**      | `https://filebrowser.${HOST}` | `admin` / `admin`                      |
+| **Guacamole**        | `https://guacamole.${HOST}`   | `guacadmin` / `guacadmin`              |
+| **AdGuard**          | `https://adguard.${HOST}`     | `admin` / (Check logs for password)    |
+| **qBittorrent**      | `https://qb.${HOST}`          | `admin` / (Check logs for password)    |
+| **BookStack (Wiki)** | `https://wiki.${HOST}`        | `admin@admin.com` / `password`         |
 
+Tip to filter for password in logs:
 ```bash
 docker logs [container_name] 2>&1 | grep "password"
 ```
