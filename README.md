@@ -118,7 +118,8 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | HOST                     | YES                                     | a valid domain address     |               | Domain address                                                                                       |
 | GUACAMOLE_VERSION        | NO                                      | a valid version            |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
 | GUACAMOLE_RECORDING_PATH | YES                                     | absolute path to directory |               | Path where session recordings and typescript will be saved                                           |
-| CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path           |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/) |
+| CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path           |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/)   |
+| LOG LEVEL                | NO                                      | INFO/WARNING/ERROR/DEBUG   |INFO           | Logger level for debugging app                                                                       |
 
 ### qBittorrent
 

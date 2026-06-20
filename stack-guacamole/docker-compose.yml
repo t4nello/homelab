@@ -7,7 +7,7 @@ services:
     labels:
       - "logaggregation=yes"
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
       - RECORDING_SEARCH_PATH=/recordings
     volumes:
       - ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
@@ -31,7 +31,7 @@ services:
       - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
       - "traefik.docker.network=applications"
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
       - GUACD_HOSTNAME=${GUACD_HOSTNAME:-guacd}
       - GUACD_PORT=${GUACD_PORT:-4822}
       - MYSQL_HOSTNAME=mysql
