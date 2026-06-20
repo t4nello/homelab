@@ -110,16 +110,16 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 
 ### Guacamole
 
-| Name                     | Required?                               | Allowed Values             | Default Value | Description                                                                                          |
-| ---------------------    | ---------                               | -------------------------  | ------------- | -----------------------------------------------------------                                          |
-| GUACD\_PORT              | NO                                      | 0-65535                    | 4822          | Guacd port                                                                                           |
-| MYSQL\_PORT              | NO                                      | 0-65535                    | 3306          | MySQL database port                                                                                  |
-| MYSQL\_PASSWORD          | YES                                     | string                     |               | MySQL password for user                                                                              |
-| HOST                     | YES                                     | a valid domain address     |               | Domain address                                                                                       |
-| GUACAMOLE_VERSION        | NO                                      | a valid version            |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
-| GUACAMOLE_RECORDING_PATH | YES                                     | absolute path to directory |               | Path where session recordings and typescript will be saved                                           |
-| CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path           |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/)   |
-| LOG_LEVEL                | NO                                      | INFO/WARNING/ERROR/DEBUG   |INFO           | Logger level for debugging app                                                                       |
+| Name                     | Required?                               | Allowed Values                                      | Default Value | Description                                                                                          |
+| ---------------------    | ---------                               | -------------------------                           | ------------- | -----------------------------------------------------------                                          |
+| GUACD\_PORT              | NO                                      | 0-65535                                             | 4822          | Guacd port                                                                                           |
+| MYSQL\_PORT              | NO                                      | 0-65535                                             | 3306          | MySQL database port                                                                                  |
+| MYSQL\_PASSWORD          | YES                                     | string                                              |               | MySQL password for user                                                                              |
+| HOST                     | YES                                     | a valid domain address                              |               | Domain address                                                                                       |
+| GUACAMOLE_VERSION        | NO                                      | a valid version                                     |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
+| GUACAMOLE_RECORDING_PATH | YES                                     | absolute path to directory                          |               | Path where session recordings and typescript will be saved                                           |
+| CONFIG_PATH              | YES IF PORTAINER_EDITION IS SET TO "CE" | an absolute path                                    |.              | Absolute path to cloned guacamole-stack config files (eg: /home/username/homelab/stack-guacamole/)   |
+| LOG_LEVEL                | NO                                      | "trace", "debug", "info", "warning", and "error".   | info          | Logger level for debugging app                                                                       |
 
 ### qBittorrent
 
