@@ -24,7 +24,7 @@ services:
     networks:
       - guacd
       - applications
-      - databse
+      - database
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
