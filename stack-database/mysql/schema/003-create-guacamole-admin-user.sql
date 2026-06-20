@@ -18,6 +18,7 @@
 --
 
 -- Create default user "guacadmin" with password "guacadmin"
+USE guacamole_db;
 INSERT INTO guacamole_entity (name, type) VALUES ('guacadmin', 'USER');
 INSERT INTO guacamole_user (entity_id, password_hash, password_salt, password_date)
 SELECT
