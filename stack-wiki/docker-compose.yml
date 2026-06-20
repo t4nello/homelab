@@ -6,10 +6,11 @@ services:
       - TZ=${TZ:-Europe/Warsaw}
       - APP_KEY=${APP_KEY}
       - APP_URL=https://wiki.${HOST}
+      - DB_CONNECTION=mysql
       - DB_HOST=${DB_HOST:-mysql}
       - DB_PORT=${DB_PORT:-3306}
-      - DB_USER=sqadmin           
-      - DB_PASS=${DB_PASSWORD}  
+      - DB_USERNAME=sqadmin           
+      - DB_PASSWORD=${DB_PASSWORD}  
       - DB_DATABASE=bookstack_db 
     volumes:
       - bookstack-data:/config
