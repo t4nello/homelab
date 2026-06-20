@@ -24,6 +24,7 @@ services:
     networks:
       - guacd
       - applications
+      - databse
     labels:
       - "logaggregation=yes"
       - "traefik.enable=true"
@@ -37,7 +38,7 @@ services:
       - MYSQL_HOSTNAME=mysql
       - MYSQL_PORT=${MYSQL_PORT:-3306}
       - MYSQL_DATABASE=guacamole_db
-      - MYSQL_USER=sqadmin
+      - MYSQL_USERNAME=sqadmin
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_AUTO_CREATE_ACCOUNTS=true
       - RECORDING_ENABLED=true
