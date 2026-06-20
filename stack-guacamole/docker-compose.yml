@@ -46,6 +46,7 @@ services:
     volumes:
       - ${GUACAMOLE_RECORDING_PATH}:/recordings:rw
     restart: unless-stopped
+    depends_on:
       guacd:
         condition: service_healthy
     healthcheck:
