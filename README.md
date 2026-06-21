@@ -2,7 +2,6 @@
 # HomeLab
 
 Set of docker-compose files for my home environment.
-See `ansible` branch for deployment with ansible
 
 ## Stacks and Applications
 
@@ -114,7 +113,6 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | ---------------------    | ---------                               | -------------------------                           | ------------- | -----------------------------------------------------------                                          |
 | GUACD\_PORT              | NO                                      | 0-65535                                             | 4822          | Guacd port                                                                                           |
 | MYSQL\_PORT              | NO                                      | 0-65535                                             | 3306          | MySQL database port                                                                                  |
-| MYSQL\_PASSWORD          | YES                                     | string                                              |               | MySQL password for user                                                                              |
 | HOST                     | YES                                     | a valid domain address                              |               | Domain address                                                                                       |
 | GUACAMOLE_VERSION        | NO                                      | a valid version                                     |               | Version of deployed guacamole. WoL works on 1.5.5                                                    |
 | GUACAMOLE_RECORDING_PATH | YES                                     | absolute path to directory                          |               | Path where session recordings and typescript will be saved                                           |
@@ -144,7 +142,6 @@ Portainer CE does not have a native toggle for relative paths. To handle this, t
 | HOST         | YES       | A valid domain address |               | Domain address                                   |
 | TZ           | NO        | IANA Time Zone         | Europe/Warsaw | Timezone for the application                     |
 | DB_HOST      | NO        | String                 | mysql         | Hostname of the MySQL container                  |
-| DB_PORT      | NO        | 0-65535                | 3306          | MySQL database port                              |
 | DB_PASS      | YES       | String                 |               | Password for the `sqadmin` user                  |
 
 ---
@@ -258,7 +255,7 @@ runas /u:MicrosoftAccount\your@email.com cmd.exe
 Now, you can connect to that computer via Remote Desktop.
 You can find the detail here https://nready.net/remote-desktop-on-windows-11-with-microsoft-account-mfa/
 
-##### Storing recording from sessions:
+#### Storing recording from sessions:
 According to documentation, directory where logs will be stored have to be owned by user 1000 and group 1001
 
 ```bash
@@ -310,10 +307,7 @@ AdGuard stops using port 3000
 
 The main UI becomes available on port 80. **So dont change ports in the setup wizard!** 
 
-The installer endpoints (/install/* and /control/install/*) are removed
-
-The setup routers can be safely deleted from your Traefik configuration
-
+The installer endpoints (/install/* and /control/install/*) are no longer used
 #### 6. Set the host to use AdGuard as DNS
 
 After AdGuard is running, configure your host to point to the local AdGuard:
