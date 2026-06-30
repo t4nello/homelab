@@ -1,7 +1,7 @@
 services:
   guacd:
     container_name: guacd
-    image: guacamole/guacd:${GUACAMOLE_VERSION:-latest}
+    image: guacamole/guacd:latest
     networks:
       - guacd
     labels:
@@ -20,7 +20,7 @@ services:
 
   guacamole:
     container_name: guacamole
-    image: guacamole/guacamole:${GUACAMOLE_VERSION:-latest}
+    image: guacamole/guacamole:latest
     networks:
       - guacd
       - applications
