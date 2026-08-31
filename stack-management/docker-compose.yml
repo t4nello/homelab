@@ -71,7 +71,7 @@ services:
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
       - "traefik.docker.network=management"
     environment:
-      - TRUSTED_ORIGINS=portainer.${HOST}
+      - TRUSTED_ORIGINS=https://portainer.${HOST},http://portainer.${HOST}
       - PORTAINER_LICENSE_KEY=${PORTAINER_LICENCE_KEY}
     command:
       - --host=unix:///var/run/docker.sock
