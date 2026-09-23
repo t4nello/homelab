@@ -1,6 +1,9 @@
 .env
+config.env
 usersfile
 */.env
+*/config.env
 */usersfile
 **/.env
+**/config.env
 **/usersfile

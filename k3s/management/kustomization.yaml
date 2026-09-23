@@ -1,0 +1,49 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - portainer
+  - cloudflare
+  - traefik
+
+configMapGenerator:
+  - name: host-config
+    namespace: management
+    envs:
+      - host.env
+
+secretGenerator:
+  - name: api-keys
+    namespace: management
+    envs:
+      - .env
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: host-config
+      fieldPath: data.PORTAINER_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: portainer
+        fieldPaths:
+          - spec.rules.0.host
+
+  - source:
+      kind: ConfigMap
+      name: host-config
+      fieldPath: data.TRAEFIK_HOST
+    targets:
+      - select:
+          kind: IngressRoute
+          name: traefik-dashboard
+        fieldPaths:
+          - spec.routes.0.match
+        options:
+          delimiter: "`"
+          index: 1

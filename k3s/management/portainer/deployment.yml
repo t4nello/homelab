@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  namespace: management
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      serviceAccountName: portainer
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: portainer
+          image: portainer/portainer-ee:lts
+          args:
+            - --http-enabled
+            - --license-key=$(PORTAINER_LICENSE_KEY)
+          env:
+            - name: PORTAINER_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-keys
+                  key: PORTAINER_LICENSE_KEY
+          ports:
+            - name: http
+              containerPort: 9000
+            - name: https
+              containerPort: 9443
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: portainer-data
+              mountPath: /data
+      volumes:
+        - name: portainer-data
+          persistentVolumeClaim:
+            claimName: portainer-config
