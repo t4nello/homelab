@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookstack
+  namespace: applications
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bookstack
+  template:
+    metadata:
+      labels:
+        app: bookstack
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: bookstack
+          image: lscr.io/linuxserver/bookstack:latest
+
+          ports:
+            - containerPort: 80
+              name: http
+
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+
+          env:
+            - name: APP_URL
+              value: "https://wiki.tanello.site"
+
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bookstack-config
+                  key: APP_KEY
+
+            - name: DB_HOST
+              value: "mysql.database.svc.cluster.local"
+
+            - name: DB_PORT
+              value: "3306"
+
+            - name: DB_DATABASE
+              value: "bookstack_db"
+
+            - name: DB_USERNAME
+              value: "bookstack_user"
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookstack-config
+                  key: DB_PASSWORD
+
+          volumeMounts:
+            - name: bookstack-config
+              mountPath: /config
+
+      volumes:
+        - name: bookstack-config
+          persistentVolumeClaim:
+            claimName: bookstack-config

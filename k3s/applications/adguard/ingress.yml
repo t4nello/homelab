@@ -1,0 +1,35 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: adguard
+  namespace: applications
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: adguard.tanello.site
+      http:
+        paths:
+          - path: /control/install
+            pathType: Prefix
+            backend:
+              service:
+                name: adguard-setup
+                port:
+                  number: 3000
+
+          - path: /install
+            pathType: Prefix
+            backend:
+              service:
+                name: adguard-setup
+                port:
+                  number: 3000
+
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adguard
+                port:
+                  number: 80

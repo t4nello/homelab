@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: adguard-config
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: adguard-local
+  hostPath:
+    path: /srv/k3s/applications/adguard
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: adguard-config
+  namespace: applications
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: adguard-local
+  resources:
+    requests:
+      storage: 5Gi

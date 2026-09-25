@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: qbittorrent-config
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: qbittorrent-config-local
+  hostPath:
+    path: /srv/k3s/applications/qbittorrent
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-config
+  namespace: applications
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: qbittorrent-config-local
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: qbittorrent-downloads
+spec:
+  capacity:
+    storage: 800Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: qbittorrent-local
+  hostPath:
+    path: /srv/samba/torrent
+    type: Directory
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-downloads
+  namespace: applications
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: qbittorrent-local
+  resources:
+    requests:
+      storage: 800Gi

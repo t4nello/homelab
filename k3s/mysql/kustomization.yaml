@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - deployment.yml
+  - pvc.yml
+  - service.yml
+
+configMapGenerator:
+  - name: mysql-init
+    namespace: database
+    files:
+      - 001-create-databases.sh=init.sh
+
+secretGenerator:
+  - name: mysql-credentials
+    namespace: database
+    envs:
+      - .env
+
+generatorOptions:
+  disableNameSuffixHash: true

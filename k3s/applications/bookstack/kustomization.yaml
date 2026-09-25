@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - storage.yml
+  - deployment.yml
+  - service.yml
+  - ingress.yml
+
+secretGenerator:
+  - name: bookstack-config
+    namespace: applications
+    envs:
+      - .env
+
+generatorOptions:
+  disableNameSuffixHash: true
