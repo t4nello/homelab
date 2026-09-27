@@ -1,43 +1,36 @@
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "adguard.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "adguard.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
-  {{- with .Values.ingress.className }}
-  ingressClassName: {{ . }}
-  {{- end }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- range .Values.ingress.tls }}
-    - hosts:
-        {{- range .hosts }}
-        - {{ . | quote }}
-        {{- end }}
-      secretName: {{ .secretName }}
-    {{- end }}
-  {{- end }}
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: {{ include "adguard.ingressHost" . }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            {{- with .pathType }}
-            pathType: {{ . }}
-            {{- end }}
+          - path: /control/install
+            pathType: Prefix
             backend:
               service:
-                name: {{ include "adguard.fullname" $ }}
+                name: {{ include "adguard.fullname" . }}-setup
                 port:
-                  number: {{ $.Values.service.port }}
-          {{- end }}
-    {{- end }}
+                  number: {{ .Values.service.setupPort }}
+          - path: /install
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "adguard.fullname" . }}-setup
+                port:
+                  number: {{ .Values.service.setupPort }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "adguard.fullname" . }}
+                port:
+                  number: {{ .Values.service.webPort }}
 {{- end }}

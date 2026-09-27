@@ -1,0 +1,67 @@
+{{- if and .Values.persistence.config.enabled (not .Values.persistence.config.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.persistence.config.volumeName }}
+  labels:
+    {{- include "qbittorrent.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: {{ .Values.persistence.config.size }}
+  accessModes:
+    - {{ .Values.persistence.config.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistence.config.reclaimPolicy }}
+  storageClassName: {{ .Values.persistence.config.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistence.config.hostPath }}
+    type: {{ .Values.persistence.config.hostPathType }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.persistence.config.claimName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "qbittorrent.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.config.accessMode }}
+  storageClassName: {{ .Values.persistence.config.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.config.size }}
+---
+{{- end }}
+{{- if and .Values.persistence.downloads.enabled (not .Values.persistence.downloads.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.persistence.downloads.volumeName }}
+  labels:
+    {{- include "qbittorrent.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: {{ .Values.persistence.downloads.size }}
+  accessModes:
+    - {{ .Values.persistence.downloads.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistence.downloads.reclaimPolicy }}
+  storageClassName: {{ .Values.persistence.downloads.storageClassName }}
+  hostPath:
+    path: {{ .Values.persistence.downloads.hostPath }}
+    type: {{ .Values.persistence.downloads.hostPathType }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.persistence.downloads.claimName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "qbittorrent.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.downloads.accessMode }}
+  storageClassName: {{ .Values.persistence.downloads.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.downloads.size }}
+{{- end }}
