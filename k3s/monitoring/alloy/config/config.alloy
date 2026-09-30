@@ -1,0 +1,113 @@
+
+discovery.kubernetes "pods" {
+  role = "pod"
+}
+
+discovery.relabel "pod_logs" {
+  targets = discovery.kubernetes.pods.targets
+
+  rule {
+    source_labels = ["__meta_kubernetes_namespace"]
+    target_label  = "namespace"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_name"]
+    target_label  = "pod"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_container_name"]
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_node_name"]
+    target_label  = "node"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+    separator     = "_"
+    target_label  = "__path__"
+    replacement   = "/var/log/pods/*$1/*.log"
+  }
+}
+
+loki.source.file "pod_logs" {
+  targets    = discovery.relabel.pod_logs.output
+  forward_to = [loki.write.local_loki.receiver]
+}
+
+loki.write "local_loki" {
+  endpoint {
+    url = "http://loki.monitoring.svc:3100/loki/api/v1/push"
+  }
+}
+
+
+prometheus.exporter.unix "node" {
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
+  rootfs_path = "/rootfs"
+}
+
+prometheus.scrape "node_exporter" {
+  scrape_interval = "15s"
+  targets         = prometheus.exporter.unix.node.targets
+  forward_to      = [prometheus.remote_write.local_prom.receiver]
+}
+
+prometheus.scrape "kube_state_metrics" {
+  scrape_interval = "15s"
+  targets         = [{ "__address__" = "kube-state-metrics.monitoring.svc:8080" }]
+  forward_to      = [prometheus.remote_write.local_prom.receiver]
+}
+
+
+discovery.relabel "annotated_pods" {
+  targets = discovery.kubernetes.pods.targets
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+    action        = "keep"
+    regex         = "true"
+  }
+
+  rule {
+    source_labels = ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
+    action        = "replace"
+    regex         = "([^:]+)(?::\\d+)?;(\\d+)"
+    replacement   = "$1:$2"
+    target_label  = "__address__"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+    action        = "replace"
+    target_label  = "__metrics_path__"
+    regex         = "(.+)"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_namespace"]
+    target_label  = "namespace"
+  }
+  rule {
+    source_labels = ["__meta_kubernetes_pod_name"]
+    target_label  = "pod"
+  }
+}
+
+prometheus.scrape "pod_metrics" {
+  scrape_interval = "15s"
+  targets         = discovery.relabel.annotated_pods.output
+  forward_to      = [prometheus.remote_write.local_prom.receiver]
+}
+
+
+prometheus.remote_write "local_prom" {
+  endpoint {
+    url = "http://prometheus.monitoring.svc:9090/api/v1/write"
+  }
+}

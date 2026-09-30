@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: alloy
+spec:
+  selector:
+    matchLabels:
+      app: alloy
+  template:
+    spec:
+      serviceAccountName: alloy
+    metadata:
+      labels:
+        app: alloy
+    spec:
+      # Prawidłowy ServiceAccount do komunikacji z API K8s
+      serviceAccountName: alloy
+      containers:
+        - name: alloy
+          image: grafana/alloy:latest
+          args:
+            - run
+            - --server.http.listen-addr=0.0.0.0:12345
+            - /etc/alloy/config.alloy
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/alloy/data
+            - name: config
+              mountPath: /etc/alloy
+            - name: varlogpods
+              mountPath: /var/log/pods
+              readOnly: true
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: alloy-config
+        - name: varlogpods
+          hostPath:
+            path: /var/log/pods
