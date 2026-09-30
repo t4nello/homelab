@@ -33,17 +33,6 @@ replacements:
   - source:
       kind: ConfigMap
       name: storage-config
-      fieldPath: data.TZ
-    targets:
-      - select:
-          kind: Deployment
-          name: qbittorrent
-        fieldPaths:
-          - spec.template.spec.containers.0.env.[name=TZ].value
-          
-  - source:
-      kind: ConfigMap
-      name: storage-config
       fieldPath: data.HOST
     targets:
       - select:
