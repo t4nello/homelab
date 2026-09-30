@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ingress.yaml
+  - middleware.yaml
+  - helmchartconfig.yaml
+
+secretGenerator:
+  - name: traefik-dashboard-auth
+    namespace: management
+    files:
+      - users=usersfile
+
+generatorOptions:
+  disableNameSuffixHash: true

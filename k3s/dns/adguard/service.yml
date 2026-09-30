@@ -1,0 +1,29 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard-setup
+  namespace: dns
+spec:
+  selector:
+    app: adguard
+  ports:
+    - name: setup
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard
+  namespace: dns
+spec:
+  selector:
+    app: adguard
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP

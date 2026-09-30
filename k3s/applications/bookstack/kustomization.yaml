@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: applications
+
+resources:
+  - configStorage.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: bookstack-secret
+    envs:
+      - envs/secrets.env
+
+configMapGenerator:
+  - name: bookstack-config
+    envs:
+      - envs/values.env
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: bookstack-config
+      fieldPath: data.APP_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: bookstack
+        fieldPaths:
+          - spec.rules.0.host
