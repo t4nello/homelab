@@ -24,6 +24,10 @@ spec:
       containers:
         - name: bookstack
           image: lscr.io/linuxserver/bookstack:latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
           ports:
             - containerPort: 80
           envFrom:

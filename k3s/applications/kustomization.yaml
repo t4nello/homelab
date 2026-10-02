@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - qbittorrent
-  #- bookstack
+  - bookstack

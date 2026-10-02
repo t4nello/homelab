@@ -21,6 +21,10 @@ spec:
       containers:
         - name: cloudflared
           image: cloudflare/cloudflared:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
           args:
             - tunnel
             - run

@@ -5,5 +5,9 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
     service:
       type: ClusterIP

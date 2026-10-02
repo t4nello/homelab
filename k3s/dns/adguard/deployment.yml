@@ -18,6 +18,10 @@ spec:
       containers:
         - name: adguard
           image: adguard/adguardhome:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 512Mi
           ports:
             - name: dns-udp
               containerPort: 53

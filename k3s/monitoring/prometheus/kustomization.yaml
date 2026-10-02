@@ -1,17 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: monitoring
-
 resources:
   - deployment.yaml
   - service.yaml
-  - rbac.yml
-  
+  - storage.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
-  - name: alloy-config
+  - name: prometheus-config
     files:
-      - config/config.alloy
+      - config/prometheus.yml
