@@ -9,8 +9,8 @@ services:
       - DB_CONNECTION=mysql
       - DB_HOST=${DB_HOST:-mysql}
       - DB_PORT=${DB_PORT:-3306}
-      - DB_USERNAME=sqadmin           
-      - DB_PASSWORD=${DB_PASSWORD}  
+      - DB_USERNAME=${BOOKSTACK_DB_USER:-bookstack}
+      - DB_PASSWORD=${BOOKSTACK_DB_PASSWORD:?Set BOOKSTACK_DB_PASSWORD}
       - DB_DATABASE=bookstack_db 
     volumes:
       - bookstack-data:/config

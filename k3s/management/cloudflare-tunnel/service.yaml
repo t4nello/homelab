@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared
+  namespace: management
+
+spec:
+  type: ClusterIP
+
+  selector:
+    pod: cloudflared
+
+  ports:
+    - name: metrics
+      port: 60123
+      targetPort: metrics
+      protocol: TCP

@@ -8,8 +8,10 @@ services:
       - "logaggregation=yes"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=sqadmin
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - GUACAMOLE_DB_USER=${GUACAMOLE_DB_USER:-guacamole}
+      - GUACAMOLE_DB_PASSWORD=${GUACAMOLE_DB_PASSWORD:?Set GUACAMOLE_DB_PASSWORD}
+      - BOOKSTACK_DB_USER=${BOOKSTACK_DB_USER:-bookstack}
+      - BOOKSTACK_DB_PASSWORD=${BOOKSTACK_DB_PASSWORD:?Set BOOKSTACK_DB_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
       - ${CONFIG_PATH:-.}/mysql/schema:/docker-entrypoint-initdb.d/

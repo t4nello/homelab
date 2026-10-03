@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: applications
+
+resources:
+  - configStorage.yaml
+  - downloadStorage.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: storage-config
+    envs:
+      - envs/values.env
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: storage-config
+      fieldPath: data.STORAGE_PATH
+    targets:
+      - select:
+          kind: PersistentVolume
+          name: qbittorrent-data-pv
+        fieldPaths:
+          - spec.local.path
+
+  - source:
+      kind: ConfigMap
+      name: storage-config
+      fieldPath: data.HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: qbittorrent
+        fieldPaths:
+          - spec.rules.0.host

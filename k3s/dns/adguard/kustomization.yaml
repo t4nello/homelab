@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dns
+configMapGenerator:
+  - name: host-config
+    envs:
+      - host.env
+
+resources:
+  - namespace.yml
+  - storage.yml
+  - deployment.yml
+  - service.yml
+  - ingress.yml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: host-config
+      fieldPath: data.ADGUARD_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: adguard
+        fieldPaths:
+          - spec.rules.0.host

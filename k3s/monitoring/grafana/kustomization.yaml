@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - storage.yaml
+  - ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: grafana-config
+    envs:
+      - envs/values.env
+  - name: grafana-datasources
+    files:
+      - config/datasources.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: grafana-config
+      fieldPath: data.HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: grafana
+        fieldPaths:
+          - spec.rules.0.host
