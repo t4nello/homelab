@@ -18,12 +18,14 @@ spec:
         fsGroup: 1001
       containers:
         - name: qbittorrent
-          image: lscr.io/linuxserver/qbittorrent:latest
+          image: qbittorrentofficial/qbittorrent-nox:latest
           resources:
             requests:
               cpu: 100m
               memory: 1Gi
           env:
+            - name: QBT_LEGAL_NOTICE
+              value: ""
             - name: PUID
               value: "1001"
             - name: PGID

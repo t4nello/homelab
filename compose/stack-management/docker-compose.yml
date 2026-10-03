@@ -72,7 +72,7 @@ services:
       - "traefik.docker.network=management"
     environment:
       - TRUSTED_ORIGINS=https://portainer.${HOST},http://portainer.${HOST}
-      - PORTAINER_LICENSE_KEY=${PORTAINER_LICENCE_KEY}
+      - PORTAINER_LICENSE_KEY=${PORTAINER_LICENSE_KEY}
     command:
       - --host=unix:///var/run/docker.sock
     volumes:
