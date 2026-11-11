@@ -6,7 +6,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - rbac.yml
-  
+  - networkpolicy.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

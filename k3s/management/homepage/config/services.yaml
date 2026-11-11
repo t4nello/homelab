@@ -1,0 +1,106 @@
+- Infrastructure:
+    - Traefik:
+        href: https://traefik.tanello.site/dashboard/
+        description: Traefik dashboard
+        icon: traefik.png
+
+    - Portainer:
+        href: https://portainer.tanello.site
+        description: Kubernetes management
+        icon: portainer.png
+        widget:
+          type: portainer
+          url: http://portainer.portainer.svc.cluster.local:9000
+          env: 1
+          key: "{{HOMEPAGE_VAR_PORTAINER_API_KEY}}"
+          kubernetes: true
+
+    - AdGuard Home:
+        href: https://adguard.tanello.site
+        description: DNS and ad blocking
+        icon: adguard-home.png
+        widget:
+          type: adguard
+          url: http://adguard.dns.svc.cluster.local
+          username: "{{HOMEPAGE_VAR_ADGUARD_USERNAME}}"
+          password: "{{HOMEPAGE_VAR_ADGUARD_PASSWORD}}"
+    
+    - OpenWRT:
+        href: http://192.168.1.2
+        description: OpenWRT router interface
+        icon: openwrt.png
+        widget:
+          type: openwrt
+          url: http://192.168.1.2
+          username: "{{HOMEPAGE_VAR_OPENWRT_USERNAME}}"
+          password: "{{HOMEPAGE_VAR_OPENWRT_PASSWORD}}"
+
+- Observability:
+    - Grafana:
+        href: https://grafana.tanello.site
+        description: Cluster metrics and charts
+        icon: grafana.png
+        widget:
+          type: grafana
+          url: http://grafana.monitoring.svc.cluster.local:3000
+          username: "{{HOMEPAGE_VAR_GRAFANA_USERNAME}}"
+          password: "{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}"
+
+    - Watch Your LAN:
+        href: https://wal.tanello.site
+        description: LAN network scanner and radar
+        icon: watchyourlan.png
+
+    - Speedtest Tracker:
+        href: https://st.tanello.site
+        description: Internet speed history
+        icon: speedtest-tracker.png
+        widget:
+          type: speedtest
+          url: http://speedtest-tracker.monitoring.svc.cluster.local
+          version: 2
+          bitratePrecision: 1
+          key: "{{HOMEPAGE_VAR_SPEEDTEST_KEY}}"
+
+- Home Automation:
+    - Home Assistant:
+        href: http://192.168.1.55:8123
+        description: Home automation
+        icon: home-assistant.png
+        siteMonitor: http://192.168.1.55:8123
+        widget:
+          type: homeassistant
+          url: http://192.168.1.55:8123
+          key: "{{HOMEPAGE_VAR_HOMEASSISTANT_KEY}}"
+          custom:
+            - key: processor_use
+              state: sensor.system_monitor_obciazenie_procesora
+              label: CPU
+            - key: memory_use_percent
+              state: sensor.system_monitor_memory_usage
+              label: RAM
+            - key: processor_temperature
+              state: sensor.system_monitor_temperatura_procesora
+              label: Temp
+            - key: disk_usage
+              state: sensor.system_monitor_disk_use
+              label: Disk
+            - key: uptime
+              state: sensor.system_monitor_czas_pracy
+              label: Uptime
+
+- Applications:
+    - BookStack:
+        href: https://wiki.tanello.site
+        description: Documentation and knowledge base
+        icon: bookstack.png
+
+    - qBittorrent:
+        href: https://qb.tanello.site
+        description: File downloading
+        icon: qbittorrent.png
+        widget:
+          type: qbittorrent
+          url: http://qbittorrent.applications.svc.cluster.local
+          username: "{{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}"
+          password: "{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}"

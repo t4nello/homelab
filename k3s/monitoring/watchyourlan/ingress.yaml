@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: watchyourlan
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: CHANGEME
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: watchyourlan
+                port:
+                  number: 8840

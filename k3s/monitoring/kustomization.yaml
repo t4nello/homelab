@@ -10,3 +10,5 @@ resources:
   - prometheus
   - grafana
   - ksm.yaml
+  - watchyourlan
+  - speedtest-tracker

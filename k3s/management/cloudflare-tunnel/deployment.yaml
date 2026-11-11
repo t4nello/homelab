@@ -21,12 +21,15 @@ spec:
       containers:
         - name: cloudflared
           image: cloudflare/cloudflared:latest
+          imagePullPolicy: Always
           resources:
             requests:
               cpu: 50m
               memory: 64Mi
           args:
             - tunnel
+            - --metrics
+            - 0.0.0.0:60123
             - run
           env:
             - name: TUNNEL_TOKEN
@@ -37,8 +40,6 @@ spec:
                   
             - name: TUNNEL_LOGLEVEL
               value: info
-            - name: TUNNEL_METRICS
-              value: "0.0.0.0:60123"
           ports:
             - name: metrics
               containerPort: 60123

@@ -377,9 +377,10 @@ kubectl get storageclass
 | Directory | Namespace / contents |
 | --- | --- |
 | `k3s/database/` | MySQL database, service, and persistent volume claim |
-| `k3s/management/` | Cloudflare Tunnel and configuration for the k3s-managed Traefik dashboard |
+| `k3s/management/` | Cloudflare Tunnel, Traefik dashboard, and Homepage |
+| `k3s/portainer/` | Portainer Business Edition in its required `portainer` namespace |
 | `k3s/dns/adguard/` | AdGuard Home, ingress, services, and persistent storage |
-| `k3s/monitoring/` | Alloy, Loki, Prometheus, Grafana, and kube-state-metrics |
+| `k3s/monitoring/` | Alloy, Loki, Prometheus, Grafana, kube-state-metrics, and WatchYourLAN |
 | `k3s/applications/` | BookStack and qBittorrent |
 
 There is no root-level Kustomize entry point, so apply each component separately from the repository root.
@@ -393,7 +394,8 @@ The repository's `.gitignore` excludes untracked files matching `**/envs`; ignor
 | Component | Local environment files to provide | Variables expected by the manifests |
 | --- | --- | --- |
 | Database | `k3s/database/envs/mysql-secrets.env` | `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD` |
-| Management | `k3s/management/envs/.api_keys.env`, `k3s/management/envs/hosts.env` | `CLOUDFLARED_TUNNEL_TOKEN`, `TRAEFIK_HOST` |
+| Management | `k3s/management/envs/.api_keys.env`, `k3s/management/envs/hosts.env` | `CLOUDFLARED_TUNNEL_TOKEN`, `TRAEFIK_HOST`, `HOMEPAGE_HOST`, `PORTAINER_HOST` (Homepage link) |
+| Portainer | `k3s/portainer/envs/hosts.env` | `PORTAINER_HOST` (use the same hostname as in Management for the Homepage link) |
 | AdGuard | `k3s/dns/adguard/host.env` | `ADGUARD_HOST` |
 | Grafana | `k3s/monitoring/grafana/envs/values.env` | `HOST` |
 | qBittorrent | `k3s/applications/qbittorrent/envs/values.env` | `HOST`, `STORAGE_PATH`, `TZ` |
@@ -406,7 +408,12 @@ In particular, the BookStack, qBittorrent, and Grafana environment files listed 
 Do not commit real passwords, API tokens, or other credentials in environment files. Keep local secret files out of version control and use an encrypted secret-management workflow for shared deployments. Check that every file referenced by a generator exists before building or applying its component; a missing generator source prevents the Kustomize build.
 
 Configure service hostnames, storage paths, and credentials in the inputs referenced by each component's Kustomization. In particular, qBittorrent's local PV is node- and path-specific, and BookStack requires both application and database configuration. Cloudflare Tunnel is started with a token, but this repository does not contain its public-hostname ingress rules; configure those in the Cloudflare side separately.
+Homepage is routed at `HOMEPAGE_HOST` and reuses the Traefik dashboard's Basic Auth middleware. Portainer Business Edition is deployed separately from `k3s/portainer/` at `PORTAINER_HOST`, in its required `portainer` namespace. Keep the `PORTAINER_HOST` values in the Portainer and Management host files in sync so the Homepage link works. Add matching public-hostname routes to the Cloudflare Tunnel configuration if these services should be reachable externally.
+Portainer's first-time setup is available at `https://<PORTAINER_HOST>`. Complete setup, then add your Business Edition license in **Settings → Licenses → Add license**. Do not store the license key in Kubernetes manifests or commit it to the repository. Portainer's Kubernetes environment uses cluster-admin permissions; restrict access to the UI and protect the license and administrator credentials.
+Portainer's [official Kubernetes installation guide](https://docs.portainer.io/start/install/server/kubernetes/baremetal) currently specifies the `portainer` namespace as a requirement.
 The k3s database uses its own `MYSQL_*` inputs and secret generation; do not assume it uses the Docker Compose database account variables.
+
+WatchYourLAN runs as a single host-network pod pinned to the `ubuntu-server` node. Before applying monitoring, replace `IFACES` in `k3s/monitoring/watchyourlan/config.yaml` with the LAN interface name on that node (for example, check `ip link` on the node). The pod needs `NET_RAW` to perform ARP scans. Its web UI listens on port `8840` of that node; no Ingress is configured. Keep access restricted to trusted LAN clients. Alloy scrapes WatchYourLAN's `/metrics` endpoint and forwards the metrics to Prometheus.
 
 ### Deploying the k3s manifests
 
@@ -417,6 +424,8 @@ kubectl apply -k k3s/database
 kubectl -n database rollout status deployment/mysql --timeout=180s
 
 kubectl apply -k k3s/management
+kubectl apply -k k3s/portainer
+kubectl -n portainer rollout status deployment/portainer --timeout=180s
 kubectl apply -k k3s/dns/adguard
 kubectl apply -k k3s/monitoring
 kubectl apply -k k3s/applications
@@ -433,6 +442,8 @@ Validate each component's rendered manifests before applying it. Check that gene
 
 ```bash
 kubectl kustomize k3s/database
+kubectl kustomize k3s/management
+kubectl kustomize k3s/portainer
 kubectl kustomize k3s/applications
 ```
 
@@ -457,7 +468,7 @@ Once all stacks are up, you can access your services at the following addresses.
 
 | Service | URL | Credentials / notes |
 | :--- | :--- | :--- |
-| **Portainer** | `https://portainer.${HOST}` | Set during first login |
+| **Portainer** | `https://portainer.${HOST}` | k3s: configure `PORTAINER_HOST`; activate the BE license in Settings |
 | **Traefik** | `https://traefik.${HOST}` | Protected by the `usersfile` Basic Auth file |
 | **Grafana** | `https://grafana.${HOST}` | Change the initial admin password |
 | **Prometheus** | `https://prometheus.${HOST}` | Protected by the `usersfile` Basic Auth file |

@@ -9,8 +9,6 @@ discovery.kubernetes "pods" {
 discovery.relabel "pod_logs" {
   targets = discovery.kubernetes.pods.targets
 
-
-
   rule {
     source_labels = ["__meta_kubernetes_namespace"]
     target_label  = "namespace"
@@ -33,14 +31,7 @@ loki.source.kubernetes "pod_logs" {
 }
 
 loki.process "pod_logs" {
-  stage.cri {
-  }
-
-  stage.labels {
-    values = {
-      stream = "",
-    }
-  }
+  stage.cri {}
 
   forward_to = [
     loki.write.local_loki.receiver,
@@ -53,24 +44,25 @@ loki.write "local_loki" {
   }
 }
 
+
 // ============================================================
 // METRYKI DO PROMETHEUSA
 // ============================================================
 
 prometheus.exporter.unix "node_exporter" {
   rootfs_path = "/host/root"
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
 
   filesystem {
-    // Wykluczamy snapy, squashfs i wirtualne ścieżki containerd:
     fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|squashfs|sysfs|tmpfs)$"
-    mount_points_exclude = "^/(dev|proc|sys|snap|var/lib/docker/.+|var/lib/kubelet/.+|run/k3s/containerd/.+)($|/)"
+    mount_points_exclude = "^/([^s].*|s([^r].*)?|sr([^v].*)?|srv.+)$"
   }
 }
 
 prometheus.scrape "node_exporter" {
   scrape_interval = "15s"
-
-  targets = prometheus.exporter.unix.node_exporter.targets
+  targets         = prometheus.exporter.unix.node_exporter.targets
 
   forward_to = [
     prometheus.relabel.global_k8s.receiver,
@@ -96,12 +88,12 @@ prometheus.scrape "kube_state_metrics" {
 prometheus.scrape "kubelet" {
   scrape_interval = "15s"
   scheme          = "https"
-
-  metrics_path = "/metrics/cadvisor"
+  metrics_path    = "/metrics/cadvisor"
 
   bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
   tls_config {
+    ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
     insecure_skip_verify = true
   }
 
@@ -125,57 +117,63 @@ discovery.relabel "annotated_pods" {
   targets = discovery.kubernetes.pods.targets
 
   rule {
-    source_labels = [
-      "__meta_kubernetes_pod_annotation_prometheus_io_scrape",
-    ]
-
-    action = "keep"
-    regex  = "true"
+    source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+    action        = "keep"
+    regex         = "true"
   }
 
   rule {
-    source_labels = [
-      "__address__",
-      "__meta_kubernetes_pod_annotation_prometheus_io_port",
-    ]
-
-    action       = "replace"
-    regex        = "([^:]+)(?::\\d+)?;(\\d+)"
-    replacement  = "$1:$2"
-    target_label = "__address__"
+    source_labels = ["__meta_kubernetes_pod_host_network"]
+    action        = "drop"
+    regex         = "true"
   }
 
   rule {
-    source_labels = [
-      "__meta_kubernetes_pod_annotation_prometheus_io_path",
-    ]
-
+    source_labels = ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
     action        = "replace"
-    target_label  = "__metrics_path__"
+    regex         = "^([^:]+)(?::\\d+)?;(\\d+)$"
+    replacement   = "$1:$2"
+    target_label  = "__address__"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+    action        = "replace"
     regex         = "(.+)"
+    target_label  = "__metrics_path__"
   }
 
   rule {
-    source_labels = [
-      "__meta_kubernetes_namespace",
-    ]
-
-    target_label = "namespace"
+    source_labels = ["__meta_kubernetes_namespace"]
+    target_label  = "namespace"
   }
 
   rule {
-    source_labels = [
-      "__meta_kubernetes_pod_name",
-    ]
-
-    target_label = "pod"
+    source_labels = ["__meta_kubernetes_pod_name"]
+    target_label  = "pod"
   }
 }
 
 prometheus.scrape "pod_metrics" {
   scrape_interval = "15s"
+  targets         = discovery.relabel.annotated_pods.output
 
-  targets = discovery.relabel.annotated_pods.output
+  forward_to = [
+    prometheus.relabel.global_k8s.receiver,
+  ]
+}
+
+prometheus.scrape "watchyourlan" {
+  scrape_interval = "30s"
+
+  targets = [
+    {
+      "__address__" = "watchyourlan.monitoring.svc:8840",
+      "job"         = "watchyourlan",
+    },
+  ]
+
+  metrics_path = "/metrics"
 
   forward_to = [
     prometheus.relabel.global_k8s.receiver,
@@ -184,7 +182,7 @@ prometheus.scrape "pod_metrics" {
 
 
 // ============================================================
-// WSPÓLNY RELABELING
+// WSPÓLNY RELABELING METRYK K8S
 // ============================================================
 
 prometheus.relabel "global_k8s" {
@@ -193,19 +191,16 @@ prometheus.relabel "global_k8s" {
   ]
 
   rule {
-    action       = "replace"
-    replacement  = "k3s"
+    action      = "replace"
+    replacement = "k3s"
     target_label = "cluster"
   }
 
   rule {
-    source_labels = [
-      "nodename",
-    ]
-
-    regex        = "^$"
-    replacement  = sys.env("HOSTNAME")
-    target_label = "nodename"
+    source_labels = ["nodename"]
+    regex         = "^$"
+    replacement   = sys.env("HOSTNAME")
+    target_label  = "nodename"
   }
 }
 
@@ -218,4 +213,65 @@ prometheus.remote_write "local_prom" {
   endpoint {
     url = "http://prometheus.monitoring.svc:9090/api/v1/write"
   }
+}
+
+
+// ============================================================
+// METRYKI Z OPENWRT
+// ============================================================
+
+prometheus.scrape "openwrt" {
+  scrape_interval = "15s"
+
+  targets = [
+    {
+      "__address__" = "192.168.1.2:9100",
+      "instance"    = "openwrt",
+      "job"         = "openwrt",
+    },
+  ]
+
+  forward_to = [
+    prometheus.relabel.openwrt.receiver,
+  ]
+}
+
+prometheus.relabel "openwrt" {
+  forward_to = [
+    prometheus.remote_write.local_prom.receiver,
+  ]
+
+  rule {
+    source_labels = ["ifname"]
+    regex         = "phy0-ap0"
+    target_label  = "ifname"
+    replacement   = "2.4GHz"
+  }
+
+  rule {
+    source_labels = ["ifname"]
+    regex         = "phy1-ap0"
+    target_label  = "ifname"
+    replacement   = "5GHz"
+  }
+}
+
+// ============================================================
+// LOGI Z OPENWRT (SYSLOG)
+// ============================================================
+
+loki.source.syslog "openwrt_syslog" {
+  listener {
+    address  = "0.0.0.0:5140"
+    protocol = "udp"
+    syslog_format = "rfc3164"
+    labels   = {
+      namespace = "monitoring",
+      container = "openwrt",
+    }
+  }
+
+  forward_to = [
+    loki.write.local_loki.receiver,
+  ]
 }
