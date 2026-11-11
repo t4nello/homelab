@@ -1,0 +1,21 @@
+- resources:
+    label: "System Usage"
+    cpu: true
+    memory: true
+    uptime: true
+    
+- resources:
+    label: "Network Usage and Temperatures"
+    network: true
+    cputemp: true
+    units: metric
+    tempmin: 0
+    tempmax: 100
+
+- resources:
+    label: "Discs"
+    expanded: true
+    disk:
+      - /
+      - /srv
+

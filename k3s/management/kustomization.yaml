@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - cloudflare-tunnel
+  - homepage
   - traefik
 
 configMapGenerator:
@@ -35,3 +36,41 @@ replacements:
         options:
           delimiter: "`"
           index: 1
+  - source:
+      kind: ConfigMap
+      name: host-config
+      fieldPath: data.HOMEPAGE_HOST
+    targets:
+      - select:
+          kind: IngressRoute
+          name: homepage
+        fieldPaths:
+          - spec.routes.0.match
+        options:
+          delimiter: "`"
+          index: 1
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.0.value
+  - source:
+      kind: ConfigMap
+      name: host-config
+      fieldPath: data.TRAEFIK_HOST
+    targets:
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.1.value
+  - source:
+      kind: ConfigMap
+      name: host-config
+      fieldPath: data.PORTAINER_HOST
+    targets:
+      - select:
+          kind: Deployment
+          name: homepage
+        fieldPaths:
+          - spec.template.spec.containers.0.env.2.value

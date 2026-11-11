@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: watchyourlan
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: watchyourlan
+  template:
+    metadata:
+      labels:
+        app: watchyourlan
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-server
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: watchyourlan
+          image: aceberg/watchyourlan:latest
+          envFrom:
+            - configMapRef:
+                name: watchyourlan-config
+          ports:
+            - name: http
+              containerPort: 8840
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_RAW
+          volumeMounts:
+            - name: data
+              mountPath: /data/WatchYourLAN
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: watchyourlan-storage

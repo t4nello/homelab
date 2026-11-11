@@ -3,86 +3,92 @@ kind: DaemonSet
 metadata:
   name: alloy
   namespace: monitoring
+  labels:
+    app: alloy
 spec:
   selector:
     matchLabels:
       app: alloy
-
   template:
     metadata:
       labels:
         app: alloy
-
     spec:
       serviceAccountName: alloy
-
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 473
+        runAsGroup: 473
+        fsGroup: 473
         seccompProfile:
           type: RuntimeDefault
-
       containers:
         - name: alloy
-          image: grafana/alloy:latest
-
+          image: grafana/alloy:v1.20.1
           securityContext:
             allowPrivilegeEscalation: false
-
-            capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: false
-
-            runAsUser: 0
-            runAsGroup: 0
-
+            readOnlyRootFilesystem: true
           resources:
             requests:
               cpu: 100m
               memory: 512Mi
-
+            limits:
+              cpu: 500m
+              memory: 1Gi
           args:
             - run
             - --server.http.listen-addr=0.0.0.0:12345
+            - --storage.path=/var/lib/alloy/data
             - /etc/alloy/config.alloy
-
           env:
             - name: HOSTNAME
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-
             - name: NODE_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
-
+          ports:
+            - name: syslog
+              containerPort: 5140
+              hostPort: 5140
+              protocol: UDP
           volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: root
+              mountPath: /host/root
+              readOnly: true
+              mountPropagation: HostToContainer
             - name: data
               mountPath: /var/lib/alloy/data
-
             - name: tmp
               mountPath: /tmp
-
             - name: config
               mountPath: /etc/alloy
               readOnly: true
-
-            - name: varlog
-              mountPath: /var/log
-              readOnly: true
-
       volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+            type: Directory
+        - name: sys
+          hostPath:
+            path: /sys
+            type: Directory
+        - name: root
+          hostPath:
+            path: /
+            type: Directory
         - name: data
           emptyDir: {}
-
         - name: tmp
           emptyDir: {}
-
         - name: config
           configMap:
             name: alloy-config
-
-        - name: varlog
-          hostPath:
-            path: /var/log
-            type: Directory

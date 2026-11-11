@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: monitoring
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - storage.yaml
+  - ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: speedtest-tracker-config
+    envs:
+      - envs/values.env
+
+secretGenerator:
+  - name: speedtest-tracker-secrets
+    envs:
+      - envs/secrets.env
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: speedtest-tracker-config
+      fieldPath: data.APP_HOST
+    targets:
+      - select:
+          kind: Ingress
+          name: speedtest-tracker
+        fieldPaths:
+          - spec.rules.0.host

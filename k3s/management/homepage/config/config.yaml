@@ -1,0 +1,21 @@
+title: Homelab
+theme: dark
+color: slate
+headerStyle: boxedWidgets
+cardStyle: hairline
+settings:
+  allowedHosts:
+    - "*"
+  layout:
+    Infrastructure:
+      style: row
+      columns: 2
+    Observability:
+      style: row
+      columns: 2
+    Home Automation:
+      style: row
+      columns: 2
+    Applications:
+      style: row
+      columns: 2
